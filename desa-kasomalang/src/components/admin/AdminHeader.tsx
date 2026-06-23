@@ -10,7 +10,7 @@ export function AdminHeader() {
             DK
           </span>
           <span className="leading-tight">
-            <span className="block font-display font-bold text-sm text-tinta">Admin Desa Kasomalang</span>
+            <span className="block font-display font-bold text-sm text-tinta">Admin Desa Kasomalang Kulon</span>
           </span>
         </Link>
         <LogoutButton />

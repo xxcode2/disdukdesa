@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useRef } from 'react';
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Search, MessageCircle, Download, Calendar } from 'lucide-react';
 import { PengajuanRecord, StatusPengajuan } from '@/types';
@@ -17,20 +17,15 @@ const STATUS_FILTER: { value: StatusPengajuan | 'semua'; label: string }[] = [
 
 function formatTanggal(iso: string) {
   return new Date(iso).toLocaleDateString('id-ID', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
+    day: 'numeric', month: 'short', year: 'numeric',
+    hour: '2-digit', minute: '2-digit',
   });
 }
 
-function formatTanggalPendek(iso: string) {
-  return new Date(iso).toLocaleDateString('id-ID', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  });
+function formatTanggalPendek(tanggal: string) {
+  // tanggal = "2026-06-23"
+  const [y, m, d] = tanggal.split('-');
+  return `${d}/${m}/${y}`;
 }
 
 function toTanggalInput(iso: string) {
@@ -45,7 +40,7 @@ function waLink(noHp: string, namaPemohon: string, kodeTiket: string) {
   return `https://wa.me/${nomor}?text=${teks}`;
 }
 
-function exportKeCSV(data: PengajuanRecord[], labelTanggal: string) {
+function exportKeExcel(data: PengajuanRecord[], labelTanggal: string) {
   const header = [
     'No', 'Kode Tiket', 'Jenis Layanan', 'Kategori',
     'Nama Pemohon', 'NIK Pemohon', 'No. KK', 'No. HP',
@@ -54,14 +49,15 @@ function exportKeCSV(data: PengajuanRecord[], labelTanggal: string) {
   ];
 
   const rows = data.map((p, i) => [
-    i + 1,
+    String(i + 1),
     p.kode_tiket,
     LAYANAN[p.jenis_layanan]?.judul ?? p.jenis_layanan,
     p.kategori ?? '-',
     p.nama_pemohon,
     p.nik_pemohon ?? '-',
-    p.no_kk ?? '-',
-    p.no_hp,
+    // Tambah apostrof di depan angka panjang agar Excel tidak ubah jadi scientific notation
+    p.no_kk ? `'${p.no_kk}` : '-',
+    p.no_hp ? `'${p.no_hp}` : '-',
     p.alamat ?? '-',
     p.rt ?? '-',
     p.rw ?? '-',
@@ -71,15 +67,18 @@ function exportKeCSV(data: PengajuanRecord[], labelTanggal: string) {
     formatTanggal(p.created_at),
   ]);
 
-  const csvContent = [header, ...rows]
-    .map((row) => row.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(','))
-    .join('\n');
+  // Gunakan TAB sebagai separator → Excel otomatis deteksi kolom
+  // Ekstensi .xls trick: Excel buka file .xls berisi TSV dan parsing otomatis per kolom
+  const tsvContent = [header, ...rows]
+    .map((row) => row.join('\t'))
+    .join('\r\n');
 
-  const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+  // BOM UTF-8 agar Excel baca huruf Indonesia dengan benar
+  const blob = new Blob(['\uFEFF' + tsvContent], { type: 'application/vnd.ms-excel;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `pengajuan_${labelTanggal.replace(/\//g, '-')}.csv`;
+  a.download = `pengajuan_${labelTanggal}.xls`;
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -95,17 +94,12 @@ export function DaftarPengajuan({ data }: { data: PengajuanRecord[] }) {
     return data.filter((p) => {
       if (statusAktif !== 'semua' && p.status !== statusAktif) return false;
       if (jenisAktif !== 'semua' && p.jenis_layanan !== jenisAktif) return false;
-
-      // Filter tanggal
       if (filterTanggalDari) {
-        const tglData = toTanggalInput(p.created_at);
-        if (tglData < filterTanggalDari) return false;
+        if (toTanggalInput(p.created_at) < filterTanggalDari) return false;
       }
       if (filterTanggalSampai) {
-        const tglData = toTanggalInput(p.created_at);
-        if (tglData > filterTanggalSampai) return false;
+        if (toTanggalInput(p.created_at) > filterTanggalSampai) return false;
       }
-
       if (cari.trim()) {
         const q = cari.toLowerCase();
         return (
@@ -127,7 +121,7 @@ export function DaftarPengajuan({ data }: { data: PengajuanRecord[] }) {
     } else if (filterTanggalSampai) {
       labelTanggal = `sampai_${filterTanggalSampai}`;
     }
-    exportKeCSV(hasilFilter, labelTanggal);
+    exportKeExcel(hasilFilter, labelTanggal);
   }
 
   function setHariIni() {
@@ -145,7 +139,7 @@ export function DaftarPengajuan({ data }: { data: PengajuanRecord[] }) {
 
   return (
     <div>
-      {/* ── SEARCH ── */}
+      {/* SEARCH */}
       <div className="flex flex-col gap-3 mb-5">
         <div className="relative">
           <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-tinta/40" />
@@ -157,7 +151,7 @@ export function DaftarPengajuan({ data }: { data: PengajuanRecord[] }) {
           />
         </div>
 
-        {/* ── FILTER TANGGAL ── */}
+        {/* FILTER TANGGAL */}
         <div className="rounded-xl border-2 border-garis bg-white p-3 flex flex-col gap-2">
           <div className="flex items-center justify-between gap-2 flex-wrap">
             <div className="flex items-center gap-2 text-xs font-semibold text-tinta/70">
@@ -204,7 +198,7 @@ export function DaftarPengajuan({ data }: { data: PengajuanRecord[] }) {
           </div>
         </div>
 
-        {/* ── FILTER STATUS ── */}
+        {/* FILTER STATUS */}
         <div className="flex gap-2 flex-wrap">
           {STATUS_FILTER.map((s) => (
             <button
@@ -221,7 +215,7 @@ export function DaftarPengajuan({ data }: { data: PengajuanRecord[] }) {
           ))}
         </div>
 
-        {/* ── FILTER JENIS ── */}
+        {/* FILTER JENIS */}
         <div className="flex gap-2 flex-wrap">
           <button
             onClick={() => setJenisAktif('semua')}
@@ -248,17 +242,17 @@ export function DaftarPengajuan({ data }: { data: PengajuanRecord[] }) {
           ))}
         </div>
 
-        {/* ── INFO HASIL + TOMBOL EXPORT ── */}
+        {/* INFO + EXPORT */}
         <div className="flex items-center justify-between gap-2">
           <p className="text-xs text-tinta/50">
             Menampilkan <span className="font-bold text-tinta">{hasilFilter.length}</span> pengajuan
             {adaFilterTanggal && (
-              <span className="ml-1">
+              <span className="ml-1 text-tinta/40">
                 {filterTanggalDari && filterTanggalSampai
-                  ? `(${formatTanggalPendek(filterTanggalDari + 'T00:00:00')} – ${formatTanggalPendek(filterTanggalSampai + 'T00:00:00')})`
+                  ? `(${formatTanggalPendek(filterTanggalDari)} – ${formatTanggalPendek(filterTanggalSampai)})`
                   : filterTanggalDari
-                  ? `(dari ${formatTanggalPendek(filterTanggalDari + 'T00:00:00')})`
-                  : `(sampai ${formatTanggalPendek(filterTanggalSampai + 'T00:00:00')})`}
+                  ? `(dari ${formatTanggalPendek(filterTanggalDari)})`
+                  : `(sampai ${formatTanggalPendek(filterTanggalSampai)})`}
               </span>
             )}
           </p>
@@ -268,12 +262,12 @@ export function DaftarPengajuan({ data }: { data: PengajuanRecord[] }) {
             className="flex items-center gap-1.5 text-xs font-semibold bg-sawah text-kertas rounded-full px-3.5 py-1.5 hover:bg-sawah-gelap transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <Download size={13} />
-            Export CSV
+            Export Excel
           </button>
         </div>
       </div>
 
-      {/* ── DAFTAR PENGAJUAN ── */}
+      {/* DAFTAR */}
       {hasilFilter.length === 0 ? (
         <div className="rounded-2xl border-2 border-dashed border-garis py-12 text-center">
           <p className="text-tinta/50 text-sm">Belum ada pengajuan yang cocok.</p>
@@ -281,10 +275,7 @@ export function DaftarPengajuan({ data }: { data: PengajuanRecord[] }) {
       ) : (
         <div className="flex flex-col gap-3">
           {hasilFilter.map((p) => (
-            <div
-              key={p.id}
-              className="block rounded-2xl border-2 border-garis bg-white p-4 hover:border-sawah transition-colors"
-            >
+            <div key={p.id} className="block rounded-2xl border-2 border-garis bg-white p-4 hover:border-sawah transition-colors">
               <div className="flex items-start justify-between gap-3">
                 <Link href={`/admin/${p.id}`} className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 flex-wrap">

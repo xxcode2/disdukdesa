@@ -13,7 +13,7 @@ function getServiceClient() {
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!url || !key) {
-    throw new Error('Missing Supabase environment variables');
+    throw new Error('Missing Supabase environment variables: NEXT_PUBLIC_SUPABASE_URL atau SUPABASE_SERVICE_ROLE_KEY belum diset.');
   }
 
   return createClient(url.trim(), key.trim());
@@ -35,11 +35,11 @@ function validateFile(file: File): { valid: boolean; error?: string } {
     // Fallback cek ekstensi jika tipe MIME tidak terdeteksi dengan benar oleh browser tertentu
     const fileNameLower = file.name.toLowerCase();
     const hasValidExt = ALLOWED_EXTENSIONS.some(ext => fileNameLower.endsWith(ext));
-    
+
     if (!hasValidExt) {
-      return { 
-        valid: false, 
-        error: `Format file harus JPEG. File terdeteksi sebagai: ${file.type || 'unknown'}` 
+      return {
+        valid: false,
+        error: `Format file harus JPEG. File terdeteksi sebagai: ${file.type || 'unknown'}`,
       };
     }
   }
@@ -47,9 +47,9 @@ function validateFile(file: File): { valid: boolean; error?: string } {
   // Cek ukuran file
   if (file.size > MAX_FILE_SIZE) {
     const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
-    return { 
-      valid: false, 
-      error: `Ukuran file terlalu besar (${sizeInMB} MB). Maksimal 1 MB.` 
+    return {
+      valid: false,
+      error: `Ukuran file terlalu besar (${sizeInMB} MB). Maksimal 1 MB.`,
     };
   }
 
@@ -58,11 +58,29 @@ function validateFile(file: File): { valid: boolean; error?: string } {
 
 export async function POST(req: NextRequest) {
   try {
-    const formData = await req.formData();
+    // Pastikan Content-Type adalah multipart/form-data
+    const contentType = req.headers.get('content-type') || '';
+    if (!contentType.includes('multipart/form-data')) {
+      return NextResponse.json(
+        { error: 'Request harus menggunakan multipart/form-data.' },
+        { status: 400 }
+      );
+    }
+
+    let formData: FormData;
+    try {
+      formData = await req.formData();
+    } catch (e) {
+      console.error('Gagal parse FormData:', e);
+      return NextResponse.json(
+        { error: 'Gagal membaca data form. Silakan coba lagi.' },
+        { status: 400 }
+      );
+    }
 
     const jenisLayanan = String(formData.get('jenis_layanan') ?? '');
     const layanan = getLayanan(jenisLayanan);
-    
+
     if (!layanan) {
       return NextResponse.json({ error: 'Jenis layanan tidak dikenali.' }, { status: 400 });
     }
@@ -104,7 +122,17 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const supabase = getServiceClient();
+    let supabase;
+    try {
+      supabase = getServiceClient();
+    } catch (e) {
+      console.error('Supabase client error:', e);
+      return NextResponse.json(
+        { error: 'Konfigurasi server bermasalah. Hubungi administrator.' },
+        { status: 500 }
+      );
+    }
+
     const kodeTiket = buatKodeTiket();
 
     // 1. Simpan Data Utama Pengajuan Terlebih Dahulu
@@ -132,61 +160,58 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (insertError || !pengajuan) {
-      console.error('Insert pengajuan gagal:', insertError);
+      console.error('Insert pengajuan gagal:', JSON.stringify(insertError));
+      const pesanError = insertError?.message || 'Unknown error';
       return NextResponse.json(
-        { error: 'Gagal menyimpan data pengajuan awal. Silakan coba lagi.' },
+        { error: `Gagal menyimpan data pengajuan. Detail: ${pesanError}` },
         { status: 500 }
       );
     }
 
     // 2. Proses Upload Dokumen
-    const dokumenEntries: { 
-      label: string; 
-      nama_file: string; 
-      path_storage: string; 
-      ukuran_bytes: number; 
-      tipe_file: string; 
-      pengajuan_id: number | string; // Sesuaikan tipe ID
+    const dokumenEntries: {
+      label: string;
+      nama_file: string;
+      path_storage: string;
+      ukuran_bytes: number;
+      tipe_file: string;
+      pengajuan_id: string; // UUID sebagai string
     }[] = [];
 
     let uploadFailed = false;
 
     for (const docDef of layanan.dokumen) {
       const file = formData.get(`dokumen__${docDef.key}`);
-      
+
       if (file && file instanceof File && file.size > 0) {
-        // --- VALIDASI FILE DI SINI ---
+        // Validasi file
         const validation = validateFile(file);
         if (!validation.valid) {
-          // Jika gagal, hapus pengajuan yang tadi dibuat agar tidak ada data sampah (opsional tapi disarankan)
+          // Rollback: hapus pengajuan yang tadi dibuat
           await supabase.from('pengajuan').delete().eq('id', pengajuan.id);
-          
           return NextResponse.json(
             { error: `File '${docDef.label}' tidak valid: ${validation.error}` },
             { status: 400 }
           );
         }
-        // -----------------------------
 
         const ext = file.name.split('.').pop() || 'jpg';
-        // Pastikan path unik per pengajuan
         const path = `${pengajuan.id}/${docDef.key}_${Date.now()}.${ext}`;
-        
+
         // Konversi ke ArrayBuffer untuk upload yang lebih stabil
         const arrayBuffer = await file.arrayBuffer();
 
         const { error: uploadError } = await supabase.storage
           .from('dokumen-warga')
           .upload(path, arrayBuffer, {
-            contentType: ALLOWED_MIME_TYPE, // Force content type ke jpeg
+            contentType: ALLOWED_MIME_TYPE,
             upsert: false,
           });
 
         if (uploadError) {
-          console.error(`Upload gagal untuk ${docDef.key}:`, uploadError);
+          console.error(`Upload gagal untuk ${docDef.key}:`, JSON.stringify(uploadError));
           uploadFailed = true;
-          // Opsional: Break loop atau lanjutkan? Di sini kita stop dan rollback.
-          break; 
+          break;
         }
 
         dokumenEntries.push({
@@ -194,8 +219,8 @@ export async function POST(req: NextRequest) {
           nama_file: file.name,
           path_storage: path,
           ukuran_bytes: file.size,
-          tipe_file: file.type,
-          pengajuan_id: pengajuan.id,
+          tipe_file: file.type || ALLOWED_MIME_TYPE,
+          pengajuan_id: pengajuan.id as string,
         });
       }
     }
@@ -212,9 +237,9 @@ export async function POST(req: NextRequest) {
     // 3. Simpan Referensi Dokumen ke Tabel 'dokumen' jika ada file yang diupload
     if (dokumenEntries.length > 0) {
       const { error: dokError } = await supabase.from('dokumen').insert(dokumenEntries);
-      
+
       if (dokError) {
-        console.error('Gagal menyimpan referensi dokumen ke DB:', dokError);
+        console.error('Gagal menyimpan referensi dokumen ke DB:', JSON.stringify(dokError));
         // Rollback kompleks: Hapus file dari storage dan hapus pengajuan
         const pathsToDelete = dokumenEntries.map(d => d.path_storage);
         await supabase.storage.from('dokumen-warga').remove(pathsToDelete);
@@ -227,10 +252,10 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       success: true,
       kodeTiket: pengajuan.kode_tiket,
-      message: 'Pengajuan berhasil dikirim!'
+      message: 'Pengajuan berhasil dikirim!',
     });
 
   } catch (err) {

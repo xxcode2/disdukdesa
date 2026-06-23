@@ -2,11 +2,23 @@ import { createClient } from '@/lib/supabase/server';
 import { PengajuanRecord, StatusPengajuan } from '@/types';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { DaftarPengajuan } from '@/components/admin/DaftarPengajuan';
-import { FileText, CheckCircle, XCircle, Loader } from 'lucide-react';
+import { TrenChart } from '@/components/admin/TrenChart';
+import { FileText, CheckCircle, XCircle, Loader, CalendarCheck } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
 const PAGE_SIZE = 20;
+const HARI_LABEL = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+
+function toTanggalLokal(d: Date) {
+  // Format YYYY-MM-DD berdasarkan tanggal lokal (bukan UTC) agar konsisten
+  // dengan zona waktu Indonesia, supaya hari "hari ini" tidak salah hitung
+  // saat mendekati tengah malam.
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
 
 export default async function HalamanAdmin({
   searchParams,
@@ -26,16 +38,32 @@ export default async function HalamanAdmin({
   // Query untuk stat cards — hitung semua tanpa pagination
   const { data: semuaData } = await supabase
     .from('pengajuan')
-    .select('status');
+    .select('status, created_at');
 
-  const allStatus = (semuaData ?? []) as { status: StatusPengajuan }[];
+  const allStatus = (semuaData ?? []) as { status: StatusPengajuan; created_at: string }[];
+
+  const hariIniStr = toTanggalLokal(new Date());
   const stats = {
     total: allStatus.length,
     baru: allStatus.filter((p) => p.status === 'baru').length,
     diproses: allStatus.filter((p) => p.status === 'diproses').length,
     selesai: allStatus.filter((p) => p.status === 'selesai').length,
     ditolak: allStatus.filter((p) => p.status === 'ditolak').length,
+    hariIni: allStatus.filter((p) => toTanggalLokal(new Date(p.created_at)) === hariIniStr).length,
   };
+
+  // Susun data tren 7 hari terakhir (termasuk hari ini)
+  const trenData = Array.from({ length: 7 }, (_, i) => {
+    const tgl = new Date();
+    tgl.setDate(tgl.getDate() - (6 - i));
+    const tanggalStr = toTanggalLokal(tgl);
+    const jumlah = allStatus.filter((p) => toTanggalLokal(new Date(p.created_at)) === tanggalStr).length;
+    return {
+      tanggal: tanggalStr,
+      labelHari: HARI_LABEL[tgl.getDay()],
+      jumlah,
+    };
+  });
 
   // Query dengan filter server-side untuk pagination
   let query = supabase
@@ -66,7 +94,7 @@ export default async function HalamanAdmin({
         <div className="mx-auto max-w-5xl px-5 py-8">
           <h1 className="font-display text-2xl font-bold text-tinta">Dashboard Admin</h1>
           <p className="text-sm text-tinta/60 mt-1 mb-6">
-            Desa Kasomalang · {stats.total} total pengajuan
+            Desa Kasomalang · {stats.total} total pengajuan · {stats.hariIni} masuk hari ini
           </p>
 
           {error && (
@@ -76,9 +104,18 @@ export default async function HalamanAdmin({
           )}
 
           {/* STAT CARDS */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
-            <div className="rounded-2xl border-2 border-biru/30 bg-white p-4 flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-biru/10 text-biru shrink-0">
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
+            <div className="rounded-2xl border-2 border-sawah-terang/50 bg-white p-4 flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-sawah-terang/15 text-sawah-gelap shrink-0">
+                <CalendarCheck size={22} />
+              </div>
+              <div>
+                <p className="text-2xl font-display font-bold text-tinta leading-none">{stats.hariIni}</p>
+                <p className="text-xs font-semibold text-tinta/60 mt-1">Hari Ini</p>
+              </div>
+            </div>
+            <div className="rounded-2xl border-2 border-garis bg-white p-4 flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-tinta/5 text-tinta/70 shrink-0">
                 <FileText size={22} />
               </div>
               <div>
@@ -86,8 +123,8 @@ export default async function HalamanAdmin({
                 <p className="text-xs font-semibold text-tinta/60 mt-1">Baru</p>
               </div>
             </div>
-            <div className="rounded-2xl border-2 border-emas/40 bg-white p-4 flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emas/10 text-emas-gelap shrink-0">
+            <div className="rounded-2xl border-2 border-kuning-sawah/40 bg-white p-4 flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-kuning-sawah/10 text-kuning-sawah shrink-0">
                 <Loader size={22} />
               </div>
               <div>
@@ -113,6 +150,11 @@ export default async function HalamanAdmin({
                 <p className="text-xs font-semibold text-tinta/60 mt-1">Perlu Dilengkapi</p>
               </div>
             </div>
+          </div>
+
+          {/* GRAFIK TREN */}
+          <div className="mb-8">
+            <TrenChart data={trenData} />
           </div>
 
           {/* DAFTAR PENGAJUAN */}

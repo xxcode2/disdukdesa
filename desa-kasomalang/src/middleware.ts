@@ -1,21 +1,15 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { updateSession } from '@/lib/supabase/middleware';
 
-export function middleware(request: NextRequest) {
-  // Contoh: Cek env variable dengan aman
-  const secret = process.env.MY_SECRET;
-  
-  if (!secret) {
-    console.error("Missing environment variable");
-    // Jangan throw error, tapi handle dengan redirect atau next()
-    return NextResponse.next(); 
-  }
-
-  // Logika lainnya...
-
-  return NextResponse.next();
+export async function middleware(request: NextRequest) {
+  return await updateSession(request);
 }
 
 export const config = {
-  matcher: '/((?!api|_next/static|_next/image|favicon.ico).*)',
+  // Hanya jalankan middleware di route non-API dan non-static
+  // API routes (/api/*) TIDAK diproses middleware agar FormData tidak di-clone
+  matcher: [
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
 };

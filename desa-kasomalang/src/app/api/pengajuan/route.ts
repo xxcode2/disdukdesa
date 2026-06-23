@@ -19,6 +19,53 @@ function getServiceClient() {
   return createClient(url.trim(), key.trim());
 }
 
+// Kirim notifikasi Telegram saat ada pengajuan baru
+async function kirimNotifikasiTelegram(data: {
+  kodeTiket: string;
+  jenisLayanan: string;
+  kategori?: string | null;
+  namaPemohon: string;
+  noHp: string;
+  jumlahDokumen: number;
+}) {
+  const botToken = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_CHAT_ID;
+
+  if (!botToken || !chatId) {
+    console.error('TELEGRAM_BOT_TOKEN atau TELEGRAM_CHAT_ID belum diset. Notifikasi dilewati.');
+    return;
+  }
+
+  const pesan =
+    `📋 *Pengajuan Baru Masuk*\n\n` +
+    `🎫 Kode Tiket: \`${data.kodeTiket}\`\n` +
+    `📁 Layanan: ${data.jenisLayanan}${data.kategori ? ` (${data.kategori})` : ''}\n` +
+    `👤 Nama: ${data.namaPemohon}\n` +
+    `📱 No. HP: ${data.noHp}\n` +
+    `📎 Dokumen terlampir: ${data.jumlahDokumen}\n\n` +
+    `Silakan cek dashboard admin untuk detail lengkap.`;
+
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: pesan,
+        parse_mode: 'Markdown',
+      }),
+    });
+
+    if (!res.ok) {
+      const errBody = await res.text();
+      console.error('Gagal kirim notifikasi Telegram:', res.status, errBody);
+    }
+  } catch (e) {
+    // Jangan sampai error Telegram bikin proses pengajuan gagal
+    console.error('Error saat kirim notifikasi Telegram:', e);
+  }
+}
+
 function buatKodeTiket() {
   const tanggal = new Date();
   const yy = String(tanggal.getFullYear()).slice(2);
@@ -251,6 +298,16 @@ export async function POST(req: NextRequest) {
         );
       }
     }
+
+    // 4. Kirim notifikasi Telegram (tidak menghambat response jika gagal)
+    await kirimNotifikasiTelegram({
+      kodeTiket: pengajuan.kode_tiket,
+      jenisLayanan: layanan.judul,
+      kategori,
+      namaPemohon,
+      noHp,
+      jumlahDokumen: dokumenEntries.length,
+    });
 
     return NextResponse.json({
       success: true,

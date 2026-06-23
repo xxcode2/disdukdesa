@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { Camera, FileCheck2, X } from 'lucide-react';
 import { DocumentRequirement } from '@/types';
 
@@ -11,13 +11,54 @@ interface DocumentUploadProps {
   error?: string;
 }
 
+const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
+const ALLOWED_TYPES = ['image/jpeg', 'image/jpg'];
+
 export function DocumentUpload({ doc, file, onChange, error }: DocumentUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [validationError, setValidationError] = useState<string>('');
+
+  function validateFile(selectedFile: File): boolean {
+    // Reset error
+    setValidationError('');
+
+    // Cek tipe file
+    if (!ALLOWED_TYPES.includes(selectedFile.type)) {
+      setValidationError('File harus berformat JPEG/JPG.');
+      return false;
+    }
+
+    // Cek ukuran file
+    if (selectedFile.size > MAX_FILE_SIZE) {
+      setValidationError('Ukuran file tidak boleh lebih dari 1MB.');
+      return false;
+    }
+
+    return true;
+  }
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const selectedFile = e.target.files?.[0] ?? null;
+    
+    if (selectedFile) {
+      if (validateFile(selectedFile)) {
+        onChange(selectedFile);
+      } else {
+        // Reset input file jika validasi gagal
+        if (inputRef.current) {
+          inputRef.current.value = '';
+        }
+        onChange(null);
+      }
+    } else {
+      onChange(null);
+    }
+  }
 
   return (
     <div
       className={`rounded-xl border-2 p-4 transition-colors ${
-        error ? 'border-bata bg-bata/5' : file ? 'border-sawah bg-sawah/5' : 'border-garis bg-white'
+        error || validationError ? 'border-bata bg-bata/5' : file ? 'border-sawah bg-sawah/5' : 'border-garis bg-white'
       }`}
     >
       <div className="flex items-start justify-between gap-3">
@@ -27,17 +68,19 @@ export function DocumentUpload({ doc, file, onChange, error }: DocumentUploadPro
             {doc.required && <span className="text-bata ml-1">*</span>}
             {!doc.required && <span className="text-tinta/50 font-normal ml-1.5 text-xs">(opsional)</span>}
           </p>
-          {doc.helpText && <p className="text-xs text-tinta/60 mt-0.5">{doc.helpText}</p>}
+          <p className="text-xs text-tinta/60 mt-0.5">
+            {doc.helpText || 'Format: JPEG, Maksimal: 1MB'}
+          </p>
         </div>
       </div>
 
       <input
         ref={inputRef}
         type="file"
-        accept="image/*,.pdf"
+        accept=".jpg,.jpeg,image/jpeg"
         capture="environment"
         className="hidden"
-        onChange={(e) => onChange(e.target.files?.[0] ?? null)}
+        onChange={handleFileChange}
       />
 
       <div className="mt-3">
@@ -60,6 +103,7 @@ export function DocumentUpload({ doc, file, onChange, error }: DocumentUploadPro
               type="button"
               onClick={() => {
                 onChange(null);
+                setValidationError('');
                 if (inputRef.current) inputRef.current.value = '';
               }}
               aria-label={`Hapus ${doc.label}`}
@@ -71,7 +115,11 @@ export function DocumentUpload({ doc, file, onChange, error }: DocumentUploadPro
         )}
       </div>
 
-      {error && <p className="mt-2 text-xs font-semibold text-bata">{error}</p>}
+      {(error || validationError) && (
+        <p className="mt-2 text-xs font-semibold text-bata">
+          {validationError || error}
+        </p>
+      )}
     </div>
   );
 }

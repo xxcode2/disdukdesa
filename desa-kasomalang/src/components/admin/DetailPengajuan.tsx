@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, FileText, MessageCircle, Loader2, Check, ExternalLink } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { ArrowLeft, FileText, MessageCircle, Loader2, Check, Download, X, Trash2, AlertTriangle } from 'lucide-react';
 import { PengajuanRecord, StatusPengajuan } from '@/types';
 import { LAYANAN } from '@/lib/layanan';
 import { StatusBadge } from '@/components/ui/StatusBadge';
@@ -43,11 +44,7 @@ const LABEL_FIELD: Record<string, string> = {
 
 function formatTanggal(iso: string) {
   return new Date(iso).toLocaleDateString('id-ID', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
+    day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit',
   });
 }
 
@@ -65,11 +62,141 @@ function formatUkuran(bytes: number | null) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+// ── MODAL FOTO ──────────────────────────────────────────────────────────────
+function ModalFoto({
+  url,
+  label,
+  namaFile,
+  namaPemohon,
+  onClose,
+}: {
+  url: string;
+  label: string;
+  namaFile: string;
+  namaPemohon: string;
+  onClose: () => void;
+}) {
+  // Nama file download: "KTP Pemohon - Budi Santoso.jpg"
+  const ext = namaFile.split('.').pop() ?? 'jpg';
+  const namaDownload = `${label} - ${namaPemohon}.${ext}`;
+
+  async function handleDownload() {
+    try {
+      const res = await fetch(url);
+      const blob = await res.blob();
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = namaDownload;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    } catch {
+      window.open(url, '_blank');
+    }
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+      onClick={onClose}
+    >
+      <div
+        className="relative bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] flex flex-col overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header modal */}
+        <div className="flex items-center justify-between gap-3 px-5 py-4 border-b-2 border-garis shrink-0">
+          <div className="min-w-0">
+            <p className="font-display font-bold text-tinta truncate">{label}</p>
+            <p className="text-xs text-tinta/50">{namaFile}</p>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={handleDownload}
+              className="flex items-center gap-1.5 text-xs font-semibold bg-sawah text-kertas rounded-full px-3 py-1.5 hover:bg-sawah-gelap transition-colors"
+            >
+              <Download size={13} />
+              Download
+            </button>
+            <button
+              onClick={onClose}
+              className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-garis transition-colors"
+            >
+              <X size={18} className="text-tinta/60" />
+            </button>
+          </div>
+        </div>
+        {/* Gambar */}
+        <div className="overflow-auto flex-1 flex items-center justify-center bg-kertas p-4">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={url}
+            alt={label}
+            className="max-w-full max-h-[70vh] object-contain rounded-xl shadow"
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── MODAL KONFIRMASI HAPUS ──────────────────────────────────────────────────
+function ModalHapus({
+  namaPemohon,
+  onConfirm,
+  onCancel,
+  loading,
+}: {
+  namaPemohon: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+  loading: boolean;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 flex flex-col gap-4">
+        <div className="flex items-center gap-3">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-bata/10 shrink-0">
+            <AlertTriangle size={24} className="text-bata" />
+          </div>
+          <div>
+            <p className="font-display font-bold text-tinta">Hapus Pengajuan?</p>
+            <p className="text-sm text-tinta/60 mt-0.5">
+              Pengajuan atas nama <strong>{namaPemohon}</strong> akan dihapus permanen beserta semua dokumennya.
+            </p>
+          </div>
+        </div>
+        <div className="flex gap-2 justify-end">
+          <button
+            onClick={onCancel}
+            disabled={loading}
+            className="rounded-xl border-2 border-garis px-4 py-2 text-sm font-semibold text-tinta hover:bg-garis transition-colors disabled:opacity-50"
+          >
+            Batal
+          </button>
+          <button
+            onClick={onConfirm}
+            disabled={loading}
+            className="flex items-center gap-1.5 rounded-xl bg-bata text-kertas px-4 py-2 text-sm font-semibold hover:bg-bata/80 transition-colors disabled:opacity-50"
+          >
+            {loading ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
+            Hapus
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── KOMPONEN UTAMA ──────────────────────────────────────────────────────────
 export function DetailPengajuan({ pengajuan, dokumen }: DetailPengajuanProps) {
+  const router = useRouter();
   const [status, setStatus] = useState<StatusPengajuan>(pengajuan.status);
   const [catatan, setCatatan] = useState(pengajuan.catatan_admin ?? '');
   const [menyimpan, setMenyimpan] = useState(false);
   const [tersimpan, setTersimpan] = useState(false);
+  const [fotoModal, setFotoModal] = useState<DokumenDenganUrl | null>(null);
+  const [showHapus, setShowHapus] = useState(false);
+  const [menghapus, setMenghapus] = useState(false);
 
   const layanan = LAYANAN[pengajuan.jenis_layanan];
 
@@ -102,12 +229,56 @@ export function DetailPengajuan({ pengajuan, dokumen }: DetailPengajuanProps) {
     }
   }
 
+  async function hapusPengajuan() {
+    setMenghapus(true);
+    try {
+      const res = await fetch(`/api/admin/pengajuan/${pengajuan.id}`, { method: 'DELETE' });
+      if (res.ok) {
+        router.push('/admin');
+        router.refresh();
+      }
+    } finally {
+      setMenghapus(false);
+      setShowHapus(false);
+    }
+  }
+
   return (
     <div className="anim-muncul">
-      <Link href="/admin" className="inline-flex items-center gap-1.5 text-sm font-semibold text-tinta/60 hover:text-sawah-gelap mb-4">
-        <ArrowLeft size={16} />
-        Kembali ke daftar
-      </Link>
+      {/* Modal foto */}
+      {fotoModal && fotoModal.url && (
+        <ModalFoto
+          url={fotoModal.url}
+          label={fotoModal.label}
+          namaFile={fotoModal.nama_file}
+          namaPemohon={pengajuan.nama_pemohon}
+          onClose={() => setFotoModal(null)}
+        />
+      )}
+
+      {/* Modal hapus */}
+      {showHapus && (
+        <ModalHapus
+          namaPemohon={pengajuan.nama_pemohon}
+          onConfirm={hapusPengajuan}
+          onCancel={() => setShowHapus(false)}
+          loading={menghapus}
+        />
+      )}
+
+      <div className="flex items-center justify-between gap-3 mb-4">
+        <Link href="/admin" className="inline-flex items-center gap-1.5 text-sm font-semibold text-tinta/60 hover:text-sawah-gelap">
+          <ArrowLeft size={16} />
+          Kembali ke daftar
+        </Link>
+        <button
+          onClick={() => setShowHapus(true)}
+          className="flex items-center gap-1.5 text-xs font-semibold text-bata border-2 border-bata/30 rounded-full px-3 py-1.5 hover:bg-bata/10 transition-colors"
+        >
+          <Trash2 size={13} />
+          Hapus Pengajuan
+        </button>
+      </div>
 
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div>
@@ -136,7 +307,7 @@ export function DetailPengajuan({ pengajuan, dokumen }: DetailPengajuanProps) {
         Hubungi {pengajuan.no_hp} via WhatsApp
       </a>
 
-      {/* Data pemohon & pelapor */}
+      {/* Data pemohon */}
       <section className="mt-6 rounded-2xl border-2 border-garis bg-white p-5">
         <h2 className="font-display font-bold text-tinta text-base border-b-2 border-garis pb-2 mb-3">
           Data Pemohon &amp; Pelapor
@@ -151,7 +322,7 @@ export function DetailPengajuan({ pengajuan, dokumen }: DetailPengajuanProps) {
         </dl>
       </section>
 
-      {/* Detail spesifik layanan */}
+      {/* Detail spesifik */}
       {Object.keys(pengajuan.detail ?? {}).length > 0 && (
         <section className="mt-4 rounded-2xl border-2 border-garis bg-white p-5">
           <h2 className="font-display font-bold text-tinta text-base border-b-2 border-garis pb-2 mb-3">
@@ -170,7 +341,7 @@ export function DetailPengajuan({ pengajuan, dokumen }: DetailPengajuanProps) {
         </section>
       )}
 
-      {/* Dokumen */}
+      {/* Dokumen — klik buka modal, bukan tab baru */}
       <section className="mt-4 rounded-2xl border-2 border-garis bg-white p-5">
         <h2 className="font-display font-bold text-tinta text-base border-b-2 border-garis pb-2 mb-3">
           Berkas Terlampir ({dokumen.length})
@@ -180,12 +351,12 @@ export function DetailPengajuan({ pengajuan, dokumen }: DetailPengajuanProps) {
         ) : (
           <div className="flex flex-col gap-2">
             {dokumen.map((d) => (
-              <a
+              <button
                 key={d.id}
-                href={d.url ?? '#'}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-between gap-3 rounded-xl border-2 border-garis px-4 py-3 hover:border-sawah hover:bg-sawah/5 transition-colors"
+                type="button"
+                onClick={() => d.url && setFotoModal(d)}
+                disabled={!d.url}
+                className="flex items-center justify-between gap-3 rounded-xl border-2 border-garis px-4 py-3 hover:border-sawah hover:bg-sawah/5 transition-colors text-left w-full disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <FileText size={18} className="text-sawah-gelap shrink-0" />
@@ -194,19 +365,18 @@ export function DetailPengajuan({ pengajuan, dokumen }: DetailPengajuanProps) {
                     <p className="text-xs text-tinta/50">{formatUkuran(d.ukuran_bytes)}</p>
                   </div>
                 </div>
-                <ExternalLink size={16} className="text-tinta/40 shrink-0" />
-              </a>
+                <span className="text-xs text-sawah-gelap font-semibold shrink-0">Lihat</span>
+              </button>
             ))}
           </div>
         )}
       </section>
 
-      {/* Status & catatan admin */}
+      {/* Status & catatan */}
       <section className="mt-4 rounded-2xl border-2 border-garis bg-white p-5">
         <h2 className="font-display font-bold text-tinta text-base border-b-2 border-garis pb-2 mb-3">
           Status &amp; Catatan Internal
         </h2>
-
         <div className="flex flex-col gap-4">
           <div>
             <label className="text-sm font-semibold text-tinta block mb-2">Status Pengajuan</label>
@@ -227,7 +397,6 @@ export function DetailPengajuan({ pengajuan, dokumen }: DetailPengajuanProps) {
               ))}
             </div>
           </div>
-
           <div>
             <label htmlFor="catatan" className="text-sm font-semibold text-tinta block mb-2">
               Catatan (hanya terlihat oleh admin)
@@ -241,13 +410,8 @@ export function DetailPengajuan({ pengajuan, dokumen }: DetailPengajuanProps) {
               className="w-full rounded-xl border-2 border-garis px-4 py-3 text-sm focus:border-sawah transition-colors resize-none"
             />
           </div>
-
           <Button onClick={simpanPerubahan} disabled={menyimpan} className="self-start">
-            {menyimpan ? (
-              <Loader2 size={18} className="animate-spin" />
-            ) : tersimpan ? (
-              <Check size={18} />
-            ) : null}
+            {menyimpan ? <Loader2 size={18} className="animate-spin" /> : tersimpan ? <Check size={18} /> : null}
             {tersimpan ? 'Tersimpan' : 'Simpan Perubahan'}
           </Button>
         </div>

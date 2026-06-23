@@ -1,8 +1,9 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { Camera, FileCheck2, X } from 'lucide-react';
+import { Camera, FileCheck2, Loader2, X } from 'lucide-react';
 import { DocumentRequirement } from '@/types';
+import { compressImage } from '@/lib/compressImage';
 
 interface DocumentUploadProps {
   doc: DocumentRequirement;
@@ -17,6 +18,7 @@ const ALLOWED_TYPES = ['image/jpeg', 'image/jpg'];
 export function DocumentUpload({ doc, file, onChange, error }: DocumentUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [validationError, setValidationError] = useState<string>('');
+  const [memproses, setMemproses] = useState(false);
 
   function validateFile(selectedFile: File): boolean {
     // Reset error
@@ -30,21 +32,35 @@ export function DocumentUpload({ doc, file, onChange, error }: DocumentUploadPro
 
     // Cek ukuran file
     if (selectedFile.size > MAX_FILE_SIZE) {
-      setValidationError('Ukuran file tidak boleh lebih dari 1MB.');
+      setValidationError('Ukuran file masih terlalu besar setelah dikompres. Coba foto ulang dengan jarak lebih jauh atau pilih file lain.');
       return false;
     }
 
     return true;
   }
 
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const selectedFile = e.target.files?.[0] ?? null;
-    
+
     if (selectedFile) {
-      if (validateFile(selectedFile)) {
-        onChange(selectedFile);
+      // Validasi tipe dulu sebelum kompresi (tidak ada gunanya kompres file yang bukan JPEG)
+      if (!ALLOWED_TYPES.includes(selectedFile.type)) {
+        setValidationError('File harus berformat JPEG/JPG.');
+        if (inputRef.current) inputRef.current.value = '';
+        onChange(null);
+        return;
+      }
+
+      setMemproses(true);
+      setValidationError('');
+
+      const hasilKompresi = await compressImage(selectedFile);
+
+      setMemproses(false);
+
+      if (validateFile(hasilKompresi)) {
+        onChange(hasilKompresi);
       } else {
-        // Reset input file jika validasi gagal
         if (inputRef.current) {
           inputRef.current.value = '';
         }
@@ -69,7 +85,7 @@ export function DocumentUpload({ doc, file, onChange, error }: DocumentUploadPro
             {!doc.required && <span className="text-tinta/50 font-normal ml-1.5 text-xs">(opsional)</span>}
           </p>
           <p className="text-xs text-tinta/60 mt-0.5">
-            {doc.helpText || 'Format: JPEG, Maksimal: 1MB'}
+            {doc.helpText || 'Format: JPEG, foto langsung dari HP juga bisa — ukuran otomatis disesuaikan'}
           </p>
         </div>
       </div>
@@ -81,10 +97,16 @@ export function DocumentUpload({ doc, file, onChange, error }: DocumentUploadPro
         capture="environment"
         className="hidden"
         onChange={handleFileChange}
+        disabled={memproses}
       />
 
       <div className="mt-3">
-        {!file ? (
+        {memproses ? (
+          <div className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-sawah/40 bg-sawah/5 py-3 text-sm font-semibold text-sawah-gelap">
+            <Loader2 size={18} className="animate-spin" />
+            Memproses foto...
+          </div>
+        ) : !file ? (
           <button
             type="button"
             onClick={() => inputRef.current?.click()}

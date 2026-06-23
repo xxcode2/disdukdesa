@@ -1,53 +1,63 @@
 import { createClient } from '@/lib/supabase/server';
-import { PengajuanRecord } from '@/types';
+import { PengajuanRecord, StatusPengajuan } from '@/types';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { DaftarPengajuan } from '@/components/admin/DaftarPengajuan';
-import { FileText, Clock, CheckCircle, XCircle, Loader } from 'lucide-react';
+import { FileText, CheckCircle, XCircle, Loader } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
-function StatCard({
-  label,
-  nilai,
-  warna,
-  icon: Icon,
-}: {
-  label: string;
-  nilai: number;
-  warna: string;
-  icon: React.ElementType;
-}) {
-  return (
-    <div className={`rounded-2xl border-2 bg-white p-4 flex items-center gap-4 ${warna}`}>
-      <div className={`flex h-11 w-11 items-center justify-center rounded-xl shrink-0 icon-bg`}>
-        <Icon size={22} />
-      </div>
-      <div>
-        <p className="text-2xl font-display font-bold text-tinta leading-none">{nilai}</p>
-        <p className="text-xs font-semibold text-tinta/60 mt-1">{label}</p>
-      </div>
-    </div>
-  );
-}
+const PAGE_SIZE = 20;
 
-export default async function HalamanAdmin() {
+export default async function HalamanAdmin({
+  searchParams,
+}: {
+  searchParams: Promise<{ halaman?: string; status?: string; jenis?: string; dari?: string; sampai?: string; cari?: string }>;
+}) {
+  const params = await searchParams;
+  const halaman = Math.max(1, Number(params.halaman ?? 1));
+  const filterStatus = params.status ?? 'semua';
+  const filterJenis = params.jenis ?? 'semua';
+  const filterDari = params.dari ?? '';
+  const filterSampai = params.sampai ?? '';
+  const filterCari = params.cari ?? '';
+
   const supabase = await createClient();
 
-  const { data, error } = await supabase
+  // Query untuk stat cards — hitung semua tanpa pagination
+  const { data: semuaData } = await supabase
     .from('pengajuan')
-    .select('*')
+    .select('status');
+
+  const allStatus = (semuaData ?? []) as { status: StatusPengajuan }[];
+  const stats = {
+    total: allStatus.length,
+    baru: allStatus.filter((p) => p.status === 'baru').length,
+    diproses: allStatus.filter((p) => p.status === 'diproses').length,
+    selesai: allStatus.filter((p) => p.status === 'selesai').length,
+    ditolak: allStatus.filter((p) => p.status === 'ditolak').length,
+  };
+
+  // Query dengan filter server-side untuk pagination
+  let query = supabase
+    .from('pengajuan')
+    .select('*', { count: 'exact' })
     .order('created_at', { ascending: false });
 
-  const pengajuanList = (data ?? []) as PengajuanRecord[];
+  if (filterStatus !== 'semua') query = query.eq('status', filterStatus);
+  if (filterJenis !== 'semua') query = query.eq('jenis_layanan', filterJenis);
+  if (filterDari) query = query.gte('created_at', filterDari + 'T00:00:00');
+  if (filterSampai) query = query.lte('created_at', filterSampai + 'T23:59:59');
+  if (filterCari.trim()) {
+    query = query.or(`nama_pemohon.ilike.%${filterCari}%,kode_tiket.ilike.%${filterCari}%,no_hp.ilike.%${filterCari}%`);
+  }
 
-  // Hitung statistik
-  const stats = {
-    total: pengajuanList.length,
-    baru: pengajuanList.filter((p) => p.status === 'baru').length,
-    diproses: pengajuanList.filter((p) => p.status === 'diproses').length,
-    selesai: pengajuanList.filter((p) => p.status === 'selesai').length,
-    ditolak: pengajuanList.filter((p) => p.status === 'ditolak').length,
-  };
+  const from = (halaman - 1) * PAGE_SIZE;
+  const to = from + PAGE_SIZE - 1;
+  query = query.range(from, to);
+
+  const { data, error, count } = await query;
+  const pengajuanList = (data ?? []) as PengajuanRecord[];
+  const totalHalaman = Math.ceil((count ?? 0) / PAGE_SIZE);
 
   return (
     <>
@@ -56,7 +66,7 @@ export default async function HalamanAdmin() {
         <div className="mx-auto max-w-5xl px-5 py-8">
           <h1 className="font-display text-2xl font-bold text-tinta">Dashboard Admin</h1>
           <p className="text-sm text-tinta/60 mt-1 mb-6">
-            Desa Kasomalang · {pengajuanList.length} total pengajuan
+            Desa Kasomalang · {stats.total} total pengajuan
           </p>
 
           {error && (
@@ -65,9 +75,8 @@ export default async function HalamanAdmin() {
             </div>
           )}
 
-          {/* ── STAT CARDS ── */}
+          {/* STAT CARDS */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
-            {/* Baru */}
             <div className="rounded-2xl border-2 border-biru/30 bg-white p-4 flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-biru/10 text-biru shrink-0">
                 <FileText size={22} />
@@ -77,8 +86,6 @@ export default async function HalamanAdmin() {
                 <p className="text-xs font-semibold text-tinta/60 mt-1">Baru</p>
               </div>
             </div>
-
-            {/* Diproses */}
             <div className="rounded-2xl border-2 border-emas/40 bg-white p-4 flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emas/10 text-emas-gelap shrink-0">
                 <Loader size={22} />
@@ -88,8 +95,6 @@ export default async function HalamanAdmin() {
                 <p className="text-xs font-semibold text-tinta/60 mt-1">Diproses</p>
               </div>
             </div>
-
-            {/* Selesai */}
             <div className="rounded-2xl border-2 border-sawah/40 bg-white p-4 flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-sawah/10 text-sawah-gelap shrink-0">
                 <CheckCircle size={22} />
@@ -99,8 +104,6 @@ export default async function HalamanAdmin() {
                 <p className="text-xs font-semibold text-tinta/60 mt-1">Selesai</p>
               </div>
             </div>
-
-            {/* Perlu Dilengkapi */}
             <div className="rounded-2xl border-2 border-bata/30 bg-white p-4 flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-bata/10 text-bata shrink-0">
                 <XCircle size={22} />
@@ -112,9 +115,16 @@ export default async function HalamanAdmin() {
             </div>
           </div>
 
-          {/* ── DAFTAR PENGAJUAN ── */}
+          {/* DAFTAR PENGAJUAN */}
           <h2 className="font-display text-lg font-bold text-tinta mb-4">Daftar Pengajuan</h2>
-          <DaftarPengajuan data={pengajuanList} />
+          <DaftarPengajuan
+            data={pengajuanList}
+            totalCount={count ?? 0}
+            halaman={halaman}
+            totalHalaman={totalHalaman}
+            pageSize={PAGE_SIZE}
+            filterAktif={{ status: filterStatus, jenis: filterJenis, dari: filterDari, sampai: filterSampai, cari: filterCari }}
+          />
         </div>
       </main>
     </>

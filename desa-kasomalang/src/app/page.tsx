@@ -1,41 +1,214 @@
 import Link from 'next/link';
-import { Users, Baby, HeartCrack, Truck, ArrowRight, MessageCircleMore } from 'lucide-react';
+import { Users, Baby, HeartCrack, Truck, ArrowRight, MessageCircleMore, ChevronDown } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 
-const layananList = [
+// ──────────────────────────────────────────────
+// DATA PERSYARATAN PER LAYANAN
+// ──────────────────────────────────────────────
+const persyaratan = [
   {
     href: '/ajukan/kk',
     icon: Users,
-    judul: 'Kartu Keluarga',
-    deskripsi: 'Buat KK baru, atau perubahan data karena hilang/rusak',
+    judul: 'Kartu Keluarga (KK)',
+    warna: 'bg-sawah/10 text-sawah-gelap',
+    border: 'border-sawah/30',
+    kategori: [
+      {
+        label: 'KK Baru',
+        dokumen: [
+          'Surat Nikah / Cerai / SPTJM',
+          'Ijasah / Ket. Tidak Punya Ijasah',
+          'Akta Kelahiran / Ket. Lahir',
+          'Form Biodata KK F-1.01 (dari Desa)',
+          'Kartu Keluarga (jika ada)',
+          'Form KK Baru F-1.15 (dari Desa)',
+          'FC KTP',
+          'Surat Ket. Peristiwa Kependudukan',
+          'Form Permohonan Dafduk F-1.02 (dari Desa)',
+        ],
+      },
+      {
+        label: 'Perubahan Data',
+        dokumen: [
+          'Kartu Keluarga Lama / Rusak',
+          'Surat Nikah / Cerai / SPTJM',
+          'Surat Pindah (jika ada)',
+          'Akta Kelahiran / Ket. Lahir',
+          'Surat Kehilangan (jika ada)',
+          'KTP Orang Tua',
+          'KTP Saksi',
+          'KTP Pelapor',
+          'Ket. Lahir Bidan / SPTJM Kelahiran',
+          'Form Kelahiran Capil F-2.01',
+          'FC KTP',
+        ],
+      },
+      {
+        label: 'KK Hilang',
+        dokumen: [
+          'Akta Kelahiran / Ket. Lahir',
+          'Kartu Keluarga (jika ada)',
+          'Surat Kehilangan Kepolisian',
+          'FC KTP',
+        ],
+      },
+      {
+        label: 'KK Rusak',
+        dokumen: [
+          'Akta Kelahiran / Ket. Lahir',
+          'Kartu Keluarga Lama',
+          'KTP Pelapor',
+          'FC KTP',
+        ],
+      },
+    ],
   },
   {
     href: '/ajukan/akte_lahir',
     icon: Baby,
     judul: 'Akte Kelahiran',
-    deskripsi: 'Pembuatan akte kelahiran anak',
+    warna: 'bg-biru/10 text-biru-gelap',
+    border: 'border-biru/30',
+    kategori: [
+      {
+        label: 'Akte Baru',
+        dokumen: [
+          'Surat Nikah / Cerai / SPTJM',
+          'Kartu Keluarga',
+          'KTP Orang Tua',
+          'KTP Saksi',
+          'KTP Pelapor',
+          'Ket. Lahir Bidan / SPTJM Kelahiran',
+          'Form Kelahiran Capil F-2.01 (dari Desa)',
+        ],
+      },
+      {
+        label: 'Perubahan Data',
+        dokumen: [
+          'Kartu Keluarga Lama / Rusak',
+          'Surat Nikah / Cerai / SPTJM',
+          'Surat Pindah (jika ada)',
+          'Akta Kelahiran / Ket. Lahir',
+          'Surat Kehilangan (jika ada)',
+          'KTP Orang Tua',
+          'KTP Saksi',
+          'KTP Pelapor',
+          'Ket. Lahir Bidan / SPTJM Kelahiran',
+          'Form Kelahiran Capil F-2.01',
+          'FC KTP',
+        ],
+      },
+    ],
   },
   {
     href: '/ajukan/akte_mati',
     icon: HeartCrack,
     judul: 'Akte Kematian',
-    deskripsi: 'Pembuatan akte kematian',
+    warna: 'bg-bata/10 text-bata',
+    border: 'border-bata/30',
+    kategori: [
+      {
+        label: 'Persyaratan',
+        dokumen: [
+          'Kartu Keluarga (KK)',
+          'KTP Almarhum/Almarhumah',
+          'KTP Saksi 1',
+          'KTP Saksi 2',
+          'KTP Pelapor',
+          'Formulir Kematian dari Desa',
+          'Surat / Ket. Kematian dari RS atau Desa',
+        ],
+      },
+    ],
   },
   {
     href: '/ajukan/surat_pindah',
     icon: Truck,
     judul: 'Surat Pindah',
-    deskripsi: 'Pembuatan surat pindah domisili',
+    warna: 'bg-emas/10 text-emas-gelap',
+    border: 'border-emas/30',
+    kategori: [
+      {
+        label: 'Persyaratan',
+        dokumen: [
+          'Kartu Keluarga (KK)',
+          'Foto Copy KTP',
+          'Form Perpindahan dari Desa (jika ada)',
+        ],
+      },
+    ],
   },
 ];
 
+// ──────────────────────────────────────────────
+// KOMPONEN ACCORDION PERSYARATAN
+// ──────────────────────────────────────────────
+function KartuPersyaratan({
+  href,
+  icon: Icon,
+  judul,
+  warna,
+  border,
+  kategori,
+}: (typeof persyaratan)[0]) {
+  return (
+    <details className={`group rounded-2xl border-2 ${border} bg-white overflow-hidden`}>
+      <summary className="flex cursor-pointer items-center gap-4 p-5 list-none select-none">
+        <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${warna} shrink-0`}>
+          <Icon size={22} />
+        </div>
+        <span className="font-display font-bold text-tinta text-base flex-1">{judul}</span>
+        <ChevronDown
+          size={18}
+          className="text-tinta/40 shrink-0 transition-transform duration-200 group-open:rotate-180"
+        />
+      </summary>
+
+      <div className="px-5 pb-5 flex flex-col gap-4 border-t-2 border-garis pt-4">
+        {kategori.map((kat) => (
+          <div key={kat.label}>
+            {kategori.length > 1 && (
+              <p className={`text-xs font-bold uppercase tracking-wide mb-2 ${warna.split(' ')[1]}`}>
+                {kat.label}
+              </p>
+            )}
+            <ul className="flex flex-col gap-1.5">
+              {kat.dokumen.map((dok, i) => (
+                <li key={i} className="flex items-start gap-2 text-sm text-tinta/80">
+                  <span className={`mt-0.5 h-4 w-4 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${warna}`}>
+                    {i + 1}
+                  </span>
+                  {dok}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+
+        <Link
+          href={href}
+          className={`mt-1 inline-flex items-center gap-1.5 text-sm font-semibold rounded-xl px-4 py-2.5 transition-colors ${warna} hover:opacity-80`}
+        >
+          Ajukan Sekarang
+          <ArrowRight size={15} />
+        </Link>
+      </div>
+    </details>
+  );
+}
+
+// ──────────────────────────────────────────────
+// HALAMAN UTAMA
+// ──────────────────────────────────────────────
 export default function HomePage() {
   return (
     <>
       <Header />
       <main className="flex-1 tekstur-kertas">
         <div className="mx-auto max-w-3xl px-5 py-10">
+
+          {/* Hero */}
           <div className="anim-muncul">
             <span className="inline-block rounded-full bg-sawah/10 text-sawah-gelap text-xs font-bold uppercase tracking-wide px-3 py-1 mb-4">
               Pelayanan Mandiri
@@ -50,29 +223,40 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="mt-8 grid gap-4 sm:grid-cols-2">
-            {layananList.map(({ href, icon: Icon, judul, deskripsi }, i) => (
+          {/* Pilihan layanan cepat */}
+          <div className="mt-8 grid gap-3 grid-cols-2 sm:grid-cols-4">
+            {persyaratan.map(({ href, icon: Icon, judul, warna }, i) => (
               <Link
                 key={href}
                 href={href}
                 style={{ animationDelay: `${i * 60}ms` }}
-                className="anim-muncul group flex flex-col gap-3 rounded-2xl border-2 border-garis bg-white p-5 transition-all hover:border-sawah hover:shadow-[4px_4px_0_0_var(--sawah)]"
+                className="anim-muncul group flex flex-col items-center gap-2 rounded-2xl border-2 border-garis bg-white p-4 transition-all hover:border-sawah hover:shadow-[3px_3px_0_0_var(--sawah)] text-center"
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-sawah/10 text-sawah-gelap">
-                  <Icon size={24} />
+                <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${warna}`}>
+                  <Icon size={22} />
                 </div>
-                <div>
-                  <h2 className="font-display font-bold text-lg text-tinta">{judul}</h2>
-                  <p className="text-sm text-tinta/60 mt-1 leading-snug">{deskripsi}</p>
-                </div>
-                <span className="mt-auto flex items-center gap-1.5 text-sm font-semibold text-sawah-gelap">
-                  Ajukan sekarang
-                  <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+                <span className="text-sm font-semibold text-tinta leading-snug">{judul}</span>
+                <span className="text-xs text-sawah-gelap font-semibold flex items-center gap-0.5">
+                  Ajukan <ArrowRight size={11} className="transition-transform group-hover:translate-x-0.5" />
                 </span>
               </Link>
             ))}
           </div>
 
+          {/* Persyaratan */}
+          <div className="mt-10 anim-muncul">
+            <h2 className="font-display text-xl font-bold text-tinta mb-1">Persyaratan Dokumen</h2>
+            <p className="text-sm text-tinta/60 mb-5">
+              Klik layanan di bawah untuk melihat berkas apa saja yang perlu disiapkan sebelum mengajukan.
+            </p>
+            <div className="flex flex-col gap-3">
+              {persyaratan.map((item) => (
+                <KartuPersyaratan key={item.href} {...item} />
+              ))}
+            </div>
+          </div>
+
+          {/* Info tiket */}
           <div className="anim-muncul mt-8 flex items-start gap-3 rounded-2xl border-2 border-garis bg-kertas-2 p-5">
             <MessageCircleMore size={22} className="text-sawah-gelap shrink-0 mt-0.5" />
             <p className="text-sm text-tinta/70 leading-relaxed">
@@ -81,6 +265,7 @@ export default function HomePage() {
               kabar selanjutnya.
             </p>
           </div>
+
         </div>
       </main>
       <Footer />

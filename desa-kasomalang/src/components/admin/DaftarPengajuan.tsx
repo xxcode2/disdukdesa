@@ -70,9 +70,20 @@ function waLink(noHp: string, namaPemohon: string, kodeTiket: string) {
 }
 
 function exportKeCSV(data: PengajuanRecord[], labelTanggal: string) {
-  const kutip = (s: string) => `"${String(s).replace(/"/g, '""')}"`;
-  const header = KOLOM_CSV.map((k) => kutip(k.header)).join(',');
-  const rows = data.map((p, i) => KOLOM_CSV.map((k) => kutip(k.key(p, i))).join(','));
+  // Pakai delimiter titik-koma (;) karena Excel berlocale Indonesia/Eropa
+  // membaca koma (,) sebagai pemisah desimal, bukan pemisah kolom — jika
+  // dibiarkan koma, kolom akan kelihatan "geser/acak" saat file dibuka
+  // langsung (double-click) di Excel.
+  const DELIMITER = ';';
+
+  // Bersihkan newline di dalam teks (mis. dari field alamat yang multi-baris)
+  // supaya satu baris data CSV selalu = satu baris fisik di file, dan tidak
+  // membuat baris terlihat "pecah" saat dibuka di Excel/Notepad.
+  const bersihkan = (s: string) => String(s).replace(/\r\n|\r|\n/g, ' ').trim();
+  const kutip = (s: string) => `"${bersihkan(s).replace(/"/g, '""')}"`;
+
+  const header = KOLOM_CSV.map((k) => kutip(k.header)).join(DELIMITER);
+  const rows = data.map((p, i) => KOLOM_CSV.map((k) => kutip(k.key(p, i))).join(DELIMITER));
   const csv = '\uFEFF' + [header, ...rows].join('\r\n');
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
   const url = URL.createObjectURL(blob);

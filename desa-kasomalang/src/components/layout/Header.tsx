@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Home } from 'lucide-react';
+import { Home, HelpCircle } from 'lucide-react';
 
 export function Header() {
   return (
@@ -16,13 +16,22 @@ export function Header() {
             <span className="block text-xs text-tinta/60 -mt-0.5">Layanan Surat Online</span>
           </span>
         </Link>
-        <Link
-          href="/"
-          className="flex items-center gap-1.5 text-xs font-semibold text-tinta/60 border-2 border-garis rounded-full px-3 py-1.5 hover:border-sawah hover:text-sawah-gelap transition-colors"
-        >
-          <Home size={13} />
-          Beranda
-        </Link>
+        <div className="flex items-center gap-2 shrink-0">
+          <Link
+            href="/bantuan"
+            className="flex items-center gap-1.5 text-xs font-semibold text-tinta/60 border-2 border-garis rounded-full px-3 py-1.5 hover:border-sawah hover:text-sawah-gelap transition-colors"
+          >
+            <HelpCircle size={13} />
+            <span className="hidden sm:inline">Bantuan</span>
+          </Link>
+          <Link
+            href="/"
+            className="flex items-center gap-1.5 text-xs font-semibold text-tinta/60 border-2 border-garis rounded-full px-3 py-1.5 hover:border-sawah hover:text-sawah-gelap transition-colors"
+          >
+            <Home size={13} />
+            <span className="hidden sm:inline">Beranda</span>
+          </Link>
+        </div>
       </div>
     </header>
   );

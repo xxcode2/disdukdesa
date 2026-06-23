@@ -56,58 +56,27 @@ function waLink(noHp: string, namaPemohon: string, kodeTiket: string) {
   return `https://wa.me/${nomor}?text=${teks}`;
 }
 
-function exportKeExcel(data: PengajuanRecord[], labelTanggal: string) {
-  // Buat XML SpreadsheetML — format yang paling kompatibel dengan Excel
-  // Setiap sel dibungkus tag <Cell> dengan tipe eksplisit → kolom tidak pernah merge
-  const esc = (s: string) => s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/\t/g, ' '); // hapus tab dalam nilai sel
+function exportKeCSV(data: PengajuanRecord[], labelTanggal: string) {
+  // Setiap nilai dibungkus tanda kutip, koma di dalam nilai di-escape
+  // Separator: koma. BOM UTF-8 agar Excel baca huruf Indonesia benar.
+  const kutip = (s: string) => `"${String(s).replace(/"/g, '""').replace(/\t/g, ' ')}"`;
 
-  const xmlRows: string[] = [];
+  const header = KOLOM_EXCEL.map((k) => kutip(k.header)).join(',');
 
-  // Baris header
-  const headerCells = KOLOM_EXCEL.map(
-    (k) => `<Cell ss:StyleID="header"><Data ss:Type="String">${esc(k.header)}</Data></Cell>`
-  ).join('');
-  xmlRows.push(`<Row>${headerCells}</Row>`);
+  const rows = data.map((p, i) =>
+    KOLOM_EXCEL.map((k) => {
+      const val = k.key(p, i).replace(/^\t/, '');
+      return kutip(val);
+    }).join(',')
+  );
 
-  // Baris data
-  data.forEach((p, i) => {
-    const cells = KOLOM_EXCEL.map((k) => {
-      const raw = k.key(p, i).replace(/^\t/, ''); // hapus prefix tab (trick lama, tidak dipakai di XML)
-      return `<Cell><Data ss:Type="String">${esc(raw)}</Data></Cell>`;
-    }).join('');
-    xmlRows.push(`<Row>${cells}</Row>`);
-  });
+  const csv = '\uFEFF' + [header, ...rows].join('\r\n');
 
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<?mso-application progid="Excel.Sheet"?>
-<Workbook
-  xmlns="urn:schemas-microsoft-com:office:spreadsheet"
-  xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
-  xmlns:x="urn:schemas-microsoft-com:office:excel">
-  <Styles>
-    <Style ss:ID="header">
-      <Font ss:Bold="1"/>
-      <Interior ss:Color="#2D6A4F" ss:Pattern="Solid"/>
-      <Font ss:Color="#FFFFFF" ss:Bold="1"/>
-    </Style>
-  </Styles>
-  <Worksheet ss:Name="Pengajuan">
-    <Table>
-      ${xmlRows.join('\n      ')}
-    </Table>
-  </Worksheet>
-</Workbook>`;
-
-  const blob = new Blob([xml], { type: 'application/vnd.ms-excel;charset=utf-8' });
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `pengajuan_${labelTanggal}.xls`;
+  a.download = `pengajuan_${labelTanggal}.csv`;
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -138,7 +107,7 @@ export function DaftarPengajuan({ data }: { data: PengajuanRecord[] }) {
     if (filterTanggalDari && filterTanggalSampai) label = `${filterTanggalDari}_sd_${filterTanggalSampai}`;
     else if (filterTanggalDari) label = `dari_${filterTanggalDari}`;
     else if (filterTanggalSampai) label = `sampai_${filterTanggalSampai}`;
-    exportKeExcel(hasilFilter, label);
+    exportKeCSV(hasilFilter, label);
   }
 
   function setHariIni() {
@@ -224,7 +193,7 @@ export function DaftarPengajuan({ data }: { data: PengajuanRecord[] }) {
           <button onClick={handleExport} disabled={hasilFilter.length === 0}
             className="flex items-center gap-1.5 text-xs font-semibold bg-sawah text-kertas rounded-full px-3.5 py-1.5 hover:bg-sawah-gelap transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
             <Download size={13} />
-            Export Excel
+            Export CSV
           </button>
         </div>
       </div>

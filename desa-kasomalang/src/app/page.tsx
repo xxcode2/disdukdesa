@@ -256,14 +256,35 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Info tiket */}
-          <div className="anim-muncul mt-8 flex items-start gap-3 rounded-2xl border-2 border-garis bg-kertas-2 p-5">
-            <MessageCircleMore size={22} className="text-sawah-gelap shrink-0 mt-0.5" />
-            <p className="text-sm text-tinta/70 leading-relaxed">
-              Setelah pengajuan dikirim, simpan <strong className="text-tinta">kode tiket</strong>{' '}
-              yang muncul di layar. Petugas akan menghubungi nomor HP yang Anda daftarkan untuk
-              kabar selanjutnya.
-            </p>
+          {/* Info tiket + kontak WA desa */}
+          <div className="anim-muncul mt-8 flex flex-col gap-3">
+            <div className="flex items-start gap-3 rounded-2xl border-2 border-garis bg-kertas-2 p-5">
+              <MessageCircleMore size={22} className="text-sawah-gelap shrink-0 mt-0.5" />
+              <p className="text-sm text-tinta/70 leading-relaxed">
+                Setelah pengajuan dikirim, simpan <strong className="text-tinta">kode tiket</strong>{' '}
+                yang muncul di layar. Petugas akan menghubungi nomor HP yang Anda daftarkan untuk
+                kabar selanjutnya.
+              </p>
+            </div>
+
+            <a
+              href="https://wa.me/6285196553835?text=Halo%20Desa%20Kasomalang%2C%20saya%20ingin%20bertanya%20mengenai%20layanan%20surat."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-4 rounded-2xl border-2 border-sawah/40 bg-sawah/5 p-5 hover:bg-sawah/10 transition-colors group"
+            >
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-sawah text-kertas shrink-0">
+                <MessageCircleMore size={24} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="font-display font-bold text-tinta text-base">Butuh Bantuan?</p>
+                <p className="text-sm text-tinta/60 mt-0.5">
+                  Hubungi petugas Desa Kasomalang Kulon langsung via WhatsApp
+                </p>
+                <p className="text-sm font-bold text-sawah-gelap mt-1">0851-9655-3835</p>
+              </div>
+              <ArrowRight size={18} className="text-sawah-gelap shrink-0 transition-transform group-hover:translate-x-1" />
+            </a>
           </div>
 
         </div>

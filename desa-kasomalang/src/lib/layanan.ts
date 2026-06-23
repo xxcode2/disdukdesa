@@ -35,21 +35,45 @@ const kk: LayananDefinition = {
     },
   ],
   dokumen: [
-    // Berlaku semua kategori
-    { key: 'foto_ktp_suami', label: 'Foto KTP Suami (Asli)', required: true },
-    { key: 'foto_ktp_istri', label: 'Foto KTP Istri (Asli)', required: true },
-    { key: 'foto_ijazah_suami', label: 'Foto Ijazah Suami', required: false, helpText: 'Jika ada, untuk kelengkapan data pendidikan' },
-    { key: 'foto_ijazah_istri', label: 'Foto Ijazah Istri', required: false },
+    // ── KK BARU ──────────────────────────────────────────────
+    { key: 'surat_nikah',          label: 'Surat Nikah / Cerai / SPTJM',              required: true,  showWhenKategori: ['baru'] },
+    { key: 'ijazah',               label: 'Ijasah / Ket. Tidak Punya Ijasah',         required: false, showWhenKategori: ['baru'] },
+    { key: 'akte_lahir',           label: 'Akta Kelahiran / Ket. Lahir',              required: true,  showWhenKategori: ['baru'] },
+    { key: 'form_biodata_f101',    label: 'Form Biodata KK F-1.01 (dari Desa)',       required: true,  showWhenKategori: ['baru'] },
+    { key: 'kk_lama_baru',        label: 'Kartu Keluarga',                           required: false, showWhenKategori: ['baru'] },
+    { key: 'form_kk_baru_f115',   label: 'Form KK Baru F-1.15 (dari Desa)',          required: true,  showWhenKategori: ['baru'] },
+    { key: 'fc_ktp_baru',         label: 'FC KTP',                                   required: true,  showWhenKategori: ['baru'] },
+    { key: 'surat_ket_kependudukan_baru', label: 'Surat Ket. Peristiwa Kependudukan', required: false, showWhenKategori: ['baru'] },
+    { key: 'form_dafduk_f102_baru', label: 'Form Permohonan Dafduk F-1.02 (dari Desa)', required: true, showWhenKategori: ['baru'] },
 
-    // Khusus perubahan data / hilang / rusak — perlu KK lama
-    { key: 'foto_kk_lama', label: 'Foto KK Asli (Lama)', required: true, showWhenKategori: ['perubahan_data', 'hilang', 'rusak'] },
+    // ── PERUBAHAN DATA ────────────────────────────────────────
+    { key: 'kk_lama_perubahan',   label: 'Kartu Keluarga Lama / Rusak',              required: true,  showWhenKategori: ['perubahan_data'] },
+    { key: 'surat_nikah_perubahan', label: 'Surat Nikah / Cerai / SPTJM',            required: false, showWhenKategori: ['perubahan_data'] },
+    { key: 'surat_pindah_perubahan', label: 'Surat Pindah',                          required: false, showWhenKategori: ['perubahan_data'] },
+    { key: 'ijazah_perubahan',    label: 'Ijasah / Ket. Tidak Punya Ijasah',         required: false, showWhenKategori: ['perubahan_data'] },
+    { key: 'akte_lahir_perubahan', label: 'Akta Kelahiran / Ket. Lahir',             required: false, showWhenKategori: ['perubahan_data'] },
+    { key: 'form_perubahan_f106', label: 'Form Perubahan KK F-1.06 (dari Desa)',     required: true,  showWhenKategori: ['perubahan_data'] },
+    { key: 'form_biodata_f101_perubahan', label: 'Form Biodata KK F-1.01 (dari Desa)', required: true, showWhenKategori: ['perubahan_data'] },
+    { key: 'fc_ktp_perubahan',    label: 'FC KTP',                                   required: true,  showWhenKategori: ['perubahan_data'] },
+    { key: 'akte_kematian_perubahan', label: 'Akta Kematian',                        required: false, showWhenKategori: ['perubahan_data'] },
+    { key: 'surat_ket_kependudukan_perubahan', label: 'Surat Ket. Peristiwa Kependudukan', required: false, showWhenKategori: ['perubahan_data'] },
+    { key: 'form_dafduk_f102_perubahan', label: 'Form Permohonan Dafduk F-1.02 (dari Desa)', required: true, showWhenKategori: ['perubahan_data'] },
 
-    // Khusus KK baru — perlu dokumen lengkap suami istri
-    { key: 'foto_kk_orangtua_suami', label: 'Foto KK Orang Tua Suami (Sebelumnya)', required: true, showWhenKategori: ['baru'] },
-    { key: 'foto_kk_orangtua_istri', label: 'Foto KK Orang Tua Istri (Sebelumnya)', required: true, showWhenKategori: ['baru'] },
-    { key: 'foto_akte_lahir_suami', label: 'Foto Akte Kelahiran Suami', required: true, showWhenKategori: ['baru'] },
-    { key: 'foto_akte_lahir_istri', label: 'Foto Akte Kelahiran Istri', required: true, showWhenKategori: ['baru'] },
-    { key: 'foto_surat_nikah', label: 'Foto Surat/Buku Nikah', required: true, showWhenKategori: ['baru'] },
+    // ── HILANG ───────────────────────────────────────────────
+    { key: 'form_biodata_f101_hilang', label: 'Form Biodata KK F-1.01 (dari Desa)', required: true,  showWhenKategori: ['hilang'] },
+    { key: 'kk_hilang',           label: 'Kartu Keluarga',                           required: false, showWhenKategori: ['hilang'] },
+    { key: 'surat_kehilangan',    label: 'Surat Kehilangan Kepolisian',               required: true,  showWhenKategori: ['hilang'] },
+    { key: 'form_kk_baru_f115_hilang', label: 'Form KK Baru F-1.15 (dari Desa)',    required: true,  showWhenKategori: ['hilang'] },
+    { key: 'fc_ktp_hilang',       label: 'FC KTP',                                   required: true,  showWhenKategori: ['hilang'] },
+    { key: 'form_dafduk_f102_hilang', label: 'Form Permohonan Dafduk F-1.02 (dari Desa)', required: true, showWhenKategori: ['hilang'] },
+
+    // ── RUSAK ────────────────────────────────────────────────
+    { key: 'kk_lama_rusak',       label: 'Kartu Keluarga Lama / Rusak',              required: true,  showWhenKategori: ['rusak'] },
+    { key: 'surat_nikah_rusak',   label: 'Surat Nikah / Cerai / SPTJM',              required: false, showWhenKategori: ['rusak'] },
+    { key: 'form_biodata_f101_rusak', label: 'Form Biodata KK F-1.01 (dari Desa)',  required: true,  showWhenKategori: ['rusak'] },
+    { key: 'form_kk_baru_f115_rusak', label: 'Form KK Baru F-1.15 (dari Desa)',     required: true,  showWhenKategori: ['rusak'] },
+    { key: 'fc_ktp_rusak',        label: 'FC KTP',                                   required: true,  showWhenKategori: ['rusak'] },
+    { key: 'form_dafduk_f102_rusak', label: 'Form Permohonan Dafduk F-1.02 (dari Desa)', required: true, showWhenKategori: ['rusak'] },
   ],
 };
 
@@ -70,17 +94,14 @@ const akteLahir: LayananDefinition = {
     { key: 'kelurahan', label: 'Kelurahan/Desa', type: 'text', required: true, placeholder: 'Kasomalang', group: 'pemohon' },
     { key: 'kecamatan', label: 'Kecamatan', type: 'text', required: true, placeholder: 'Kasomalang', group: 'pemohon' },
     { key: 'no_hp', label: 'No. Telp/HP', type: 'tel', required: true, placeholder: '08xxxxxxxxxx', group: 'pemohon' },
-
     { key: 'nama_anak', label: 'Nama Lengkap Anak', type: 'text', required: true, group: 'detail' },
     { key: 'jenis_kelamin_anak', label: 'Jenis Kelamin Anak', type: 'radio', required: true, options: [{ value: 'L', label: 'Laki-laki' }, { value: 'P', label: 'Perempuan' }], group: 'detail' },
     { key: 'tempat_lahir_anak', label: 'Tempat Lahir', type: 'text', required: true, group: 'detail' },
     { key: 'tanggal_lahir_anak', label: 'Tanggal Lahir', type: 'date', required: true, group: 'detail' },
     { key: 'nama_ayah', label: 'Nama Ayah', type: 'text', required: true, group: 'detail' },
     { key: 'nama_ibu', label: 'Nama Ibu', type: 'text', required: true, group: 'detail' },
-
     { key: 'nik_pelapor', label: 'NIK Pelapor', type: 'text', required: true, group: 'pelapor' },
     { key: 'nama_pelapor', label: 'Nama Pelapor', type: 'text', required: true, group: 'pelapor' },
-
     { key: 'nama_saksi_1', label: 'Nama Saksi 1', type: 'text', required: true, group: 'detail' },
     { key: 'nama_saksi_2', label: 'Nama Saksi 2', type: 'text', required: true, group: 'detail' },
   ],
@@ -116,15 +137,12 @@ const akteMati: LayananDefinition = {
     { key: 'kelurahan', label: 'Kelurahan/Desa', type: 'text', required: true, placeholder: 'Kasomalang', group: 'pemohon' },
     { key: 'kecamatan', label: 'Kecamatan', type: 'text', required: true, placeholder: 'Kasomalang', group: 'pemohon' },
     { key: 'no_hp', label: 'No. Telp/HP', type: 'tel', required: true, placeholder: '08xxxxxxxxxx', group: 'pemohon' },
-
     { key: 'nama_almarhum', label: 'Nama Almarhum/Almarhumah', type: 'text', required: true, group: 'detail' },
     { key: 'nik_almarhum', label: 'NIK Almarhum/Almarhumah', type: 'text', required: true, group: 'detail' },
     { key: 'tanggal_wafat', label: 'Tanggal Wafat', type: 'date', required: true, group: 'detail' },
     { key: 'tempat_wafat', label: 'Tempat Wafat', type: 'text', required: true, placeholder: 'Rumah / RS / lainnya', group: 'detail' },
-
     { key: 'nik_pelapor', label: 'NIK Pelapor', type: 'text', required: true, group: 'pelapor' },
     { key: 'nama_pelapor', label: 'Nama Pelapor', type: 'text', required: true, group: 'pelapor' },
-
     { key: 'nama_saksi_1', label: 'Nama Saksi 1', type: 'text', required: true, group: 'detail' },
     { key: 'nama_saksi_2', label: 'Nama Saksi 2', type: 'text', required: true, group: 'detail' },
   ],
@@ -134,7 +152,7 @@ const akteMati: LayananDefinition = {
     { key: 'ktp_saksi_1', label: 'Foto KTP Saksi 1', required: true },
     { key: 'ktp_saksi_2', label: 'Foto KTP Saksi 2', required: true },
     { key: 'ktp_pelapor', label: 'Foto KTP Pelapor', required: true },
-    { key: 'formulir_kematian_desa', label: 'Formulir Kematian dari Desa', required: false, helpText: 'Jika belum punya, bisa diisi/diambil setelah pengajuan diproses' },
+    { key: 'formulir_kematian_desa', label: 'Formulir Kematian dari Desa', required: false },
     { key: 'surat_keterangan_kematian', label: 'Surat/Keterangan Kematian dari RS atau Desa', required: true },
   ],
 };
@@ -156,7 +174,6 @@ const suratPindah: LayananDefinition = {
     { key: 'kelurahan', label: 'Kelurahan/Desa Asal', type: 'text', required: true, placeholder: 'Kasomalang', group: 'pemohon' },
     { key: 'kecamatan', label: 'Kecamatan Asal', type: 'text', required: true, placeholder: 'Kasomalang', group: 'pemohon' },
     { key: 'no_hp', label: 'No. Telp/HP', type: 'tel', required: true, placeholder: '08xxxxxxxxxx', group: 'pemohon' },
-
     { key: 'alamat_tujuan', label: 'Alamat Tujuan Pindah', type: 'textarea', required: true, group: 'detail' },
     { key: 'kelurahan_tujuan', label: 'Kelurahan/Desa Tujuan', type: 'text', required: true, group: 'detail' },
     { key: 'kecamatan_tujuan', label: 'Kecamatan Tujuan', type: 'text', required: true, group: 'detail' },
@@ -173,7 +190,7 @@ const suratPindah: LayananDefinition = {
   dokumen: [
     { key: 'kk', label: 'Foto Kartu Keluarga (KK)', required: true },
     { key: 'fc_ktp', label: 'Foto Copy KTP', required: true },
-    { key: 'form_perpindahan_desa', label: 'Form Perpindahan dari Desa', required: false, helpText: 'Jika belum punya, bisa diisi/diambil setelah pengajuan diproses' },
+    { key: 'form_perpindahan_desa', label: 'Form Perpindahan dari Desa', required: false },
   ],
 };
 

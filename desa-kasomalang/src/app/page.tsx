@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Users, Baby, HeartCrack, Truck, ArrowRight, MessageCircleMore, ChevronDown } from 'lucide-react';
+import { Users, Baby, HeartCrack, Truck, ArrowRight, MessageCircleMore, ChevronDown, TicketCheck } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 
@@ -221,6 +221,13 @@ export default function HomePage() {
               Petugas desa akan menghubungi Anda lewat WhatsApp jika ada berkas yang kurang
               atau saat surat sudah selesai.
             </p>
+            <Link
+              href="/cek"
+              className="mt-5 inline-flex items-center gap-2 rounded-xl border-2 border-sawah bg-sawah text-kertas font-semibold px-5 py-2.5 text-sm hover:bg-sawah-gelap transition-colors"
+            >
+              <TicketCheck size={16} />
+              Cek Status Pengajuan
+            </Link>
           </div>
 
           {/* Pilihan layanan cepat */}

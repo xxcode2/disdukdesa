@@ -189,6 +189,43 @@ export default function HalamanBantuan() {
             </div>
           </section>
 
+          {/* Unduh Formulir Desa */}
+          <section className="mt-10 anim-muncul">
+            <div className="flex items-center gap-2 mb-1">
+              <IdCard size={20} className="text-sawah-gelap" />
+              <h2 className="font-display text-xl font-bold text-tinta">Unduh Formulir Desa</h2>
+            </div>
+            <p className="text-sm text-tinta/60 mb-5">
+              Formulir desa bisa diunduh, dicetak, dan dibawa saat mengurus pengajuan. Klik nama formulir untuk mengunduh.
+            </p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {[
+                { label: 'F-1.01 Form Biodata KK', href: '/forms/F-1.01_FORMULIR_BIODATA_KELUARGA.pdf' },
+                { label: 'F-1.02 Form Permohonan Dafduk', href: '/forms/F-1.02_FORMULIR_PENDAFTARAN_PERISTIWA_KEPENDUDUKAN.pdf' },
+                { label: 'F-1.03 Form Pindah Penduduk', href: '/forms/F-1.03_FORMULIR_PENDAFTARAN_PERPINDAHAN_PENDUDUK.pdf' },
+                { label: 'F-1.04 Surat Pernyataan Tidak Punya Dokumen', href: '/forms/F-1.04_SURAT_PERNYATAAN_TIDAK_MEMILIKI_DOKUMEN_KEPENDUDUKAN.pdf' },
+                { label: 'F-1.05 SPTJM Perkawinan Belum Tercatat', href: '/forms/F-1.05_SPTJM_PERKAWINAN_BELUM_TERCATAT.pdf' },
+                { label: 'F-1.06 Form Perubahan Elemen Data', href: '/forms/F-1.06_SURAT_PERNYATAAN_PERUBAHAN_ELEMEN_DATA_KEPENDUDUKAN.pdf' },
+                { label: 'F-2.01 Form Pelaporan Pencatatan Sipil', href: '/forms/F-2.01_FORMULIR_PELAPORAN_PENCATATAN_SIPIL.pdf' },
+                { label: 'F-2.03 SPTJM Kelahiran', href: '/forms/F-2.03_SPTJM_KELAHIRAN.pdf' },
+                { label: 'F-2.04 SPTJM Kebenaran Suami Istri', href: '/forms/F-2.04_SPTJM_KEBENARAN_SUAMI_ISTRI.pdf' },
+                { label: 'Form Kelahiran Baru', href: '/forms/FORMULIR_KELAHIRAN_BARU.pdf' },
+                { label: 'Form Kematian Baru', href: '/forms/FORMULIR_KEMATIAN_BARU.pdf' },
+                { label: 'SPTJM Kematian', href: '/forms/SPTJM_KEMATIAN.pdf' },
+              ].map((form) => (
+                <a
+                  key={form.href}
+                  href={form.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="rounded-2xl border-2 border-garis bg-white p-4 text-sm font-semibold text-sawah-gelap transition hover:border-sawah hover:bg-sawah/5"
+                >
+                  {form.label}
+                </a>
+              ))}
+            </div>
+          </section>
+
           {/* FAQ umum */}
           <section className="mt-10 anim-muncul">
             <div className="flex items-center gap-2 mb-1">

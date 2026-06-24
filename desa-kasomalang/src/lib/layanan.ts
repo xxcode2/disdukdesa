@@ -28,38 +28,38 @@ const kk: LayananDefinition = {
     { key: 'keterangan', label: 'Keterangan Tambahan', type: 'textarea', required: false, placeholder: 'Contoh: KK hilang sejak kapan, atau data apa yang ingin diubah', group: 'detail' },
   ],
   dokumen: [
+    // Dokumen umum untuk semua kategori KK
+    { key: 'form_biodata_f101',         label: 'Form Biodata KK F-1.01 (dari Desa)',             required: false },
+    { key: 'form_dafduk_f102',          label: 'Form Permohonan Dafduk F-1.02 (dari Desa)',      required: true },
+    { key: 'ktp_asli',                  label: 'KTP Asli / Foto KTP (suami/istri jika sudah menikah, satu saja jika belum)', required: false },
+
     // KK BARU
-    { key: 'surat_nikah',               label: 'Surat Nikah / Cerai / SPTJM',                    required: false, showWhenKategori: ['baru'] },
-    { key: 'ijazah',                    label: 'Ijasah / Ket. Tidak Punya Ijasah',               required: false, showWhenKategori: ['baru'] },
-    { key: 'akte_lahir',                label: 'Akta Kelahiran / Ket. Lahir',                    required: false, showWhenKategori: ['baru'] },
-    { key: 'form_biodata_f101',         label: 'Form Biodata KK F-1.01 (dari Desa)',             required: false, showWhenKategori: ['baru'] },
-    { key: 'kk_lama_baru',             label: 'Kartu Keluarga',                                  required: false, showWhenKategori: ['baru'] },
-    { key: 'form_kk_baru_f115',        label: 'Form KK Baru F-1.15 (dari Desa)',                required: false, showWhenKategori: ['baru'] },
-    { key: 'fc_ktp_baru',              label: 'FC KTP',                                          required: false, showWhenKategori: ['baru'] },
-    { key: 'surat_ket_kependudukan_baru', label: 'Surat Ket. Peristiwa Kependudukan',           required: false, showWhenKategori: ['baru'] },
-    { key: 'form_dafduk_f102_baru',    label: 'Form Permohonan Dafduk F-1.02 (dari Desa)',      required: false, showWhenKategori: ['baru'] },
+    { key: 'surat_nikah',               label: 'Surat Nikah / Cerai / SPTJM (jika sudah menikah)', required: false, showWhenKategori: ['baru'] },
+    { key: 'ijazah',                    label: 'Ijasah / Ket. Tidak Punya Ijasah',               required: false, showWhenKategori: ['baru', 'perubahan_data'] },
+    { key: 'akte_lahir',                label: 'Akta Kelahiran / Ket. Lahir',                    required: false, showWhenKategori: ['baru', 'perubahan_data'] },
+    { key: 'kk_lama_baru',              label: 'Kartu Keluarga (jika sudah menikah: KK istri/KK suami; jika belum: ikut KK orang tua)', required: false, showWhenKategori: ['baru'] },
+    { key: 'form_kk_baru_f115',         label: 'Form KK Baru F-1.15 (dari Desa)',                required: true, showWhenKategori: ['baru'] },
+    { key: 'surat_ket_kependudukan_baru', label: 'Surat Keterangan Peristiwa Kependudukan',      required: false, showWhenKategori: ['baru'] },
+
     // PERUBAHAN DATA
-    { key: 'kk_lama_perubahan',        label: 'Kartu Keluarga Lama / Rusak',                    required: false, showWhenKategori: ['perubahan_data'] },
+    { key: 'kk_lama_perubahan',        label: 'Kartu Keluarga Lama / Rusak',                    required: true, showWhenKategori: ['perubahan_data'] },
     { key: 'surat_nikah_perubahan',    label: 'Surat Nikah / Cerai / SPTJM',                    required: false, showWhenKategori: ['perubahan_data'] },
     { key: 'surat_pindah_perubahan',   label: 'Surat Pindah',                                   required: false, showWhenKategori: ['perubahan_data'] },
-    { key: 'akte_lahir_perubahan',     label: 'Akta Kelahiran / Ket. Lahir',                    required: false, showWhenKategori: ['perubahan_data'] },
-    { key: 'surat_kehilangan_perubahan', label: 'Surat Kehilangan',                             required: false, showWhenKategori: ['perubahan_data'] },
-    { key: 'ktp_ortu_perubahan',       label: 'KTP Orang Tua',                                  required: false, showWhenKategori: ['perubahan_data'] },
-    { key: 'ktp_saksi_perubahan',      label: 'KTP Saksi',                                      required: false, showWhenKategori: ['perubahan_data'] },
-    { key: 'ktp_pelapor_perubahan',    label: 'KTP Pelapor',                                    required: false, showWhenKategori: ['perubahan_data'] },
-    { key: 'ket_lahir_bidan_perubahan', label: 'Ket. Lahir Bidan / SPTJM Kelahiran',           required: false, showWhenKategori: ['perubahan_data'] },
-    { key: 'form_kelahiran_f201_perubahan', label: 'Form Kelahiran Capil F-2.01',               required: false, showWhenKategori: ['perubahan_data'] },
-    { key: 'fc_ktp_perubahan',         label: 'FC KTP',                                         required: false, showWhenKategori: ['perubahan_data'] },
-    // HILANG
-    { key: 'akte_lahir_hilang',        label: 'Akta Kelahiran / Ket. Lahir',                    required: false, showWhenKategori: ['hilang'] },
-    { key: 'kk_hilang',               label: 'Kartu Keluarga',                                  required: false, showWhenKategori: ['hilang'] },
-    { key: 'surat_kehilangan_hilang',  label: 'Surat Kehilangan Kepolisian',                    required: false, showWhenKategori: ['hilang'] },
-    { key: 'fc_ktp_hilang',           label: 'FC KTP',                                          required: false, showWhenKategori: ['hilang'] },
-    // RUSAK
-    { key: 'akte_lahir_rusak',         label: 'Akta Kelahiran / Ket. Lahir',                    required: false, showWhenKategori: ['rusak'] },
-    { key: 'kk_lama_rusak',           label: 'Kartu Keluarga',                                  required: false, showWhenKategori: ['rusak'] },
-    { key: 'ktp_pelapor_rusak',       label: 'KTP Pelapor',                                     required: false, showWhenKategori: ['rusak'] },
-    { key: 'fc_ktp_rusak',            label: 'FC KTP',                                          required: false, showWhenKategori: ['rusak'] },
+    { key: 'form_perubahan_kk_f106',   label: 'Form Perubahan KK F-1.06 (dari Desa)',           required: false, showWhenKategori: ['perubahan_data'] },
+    { key: 'surat_ket_kependudukan_perubahan', label: 'Surat Keterangan Peristiwa Kependudukan', required: false, showWhenKategori: ['perubahan_data'] },
+    { key: 'akta_kematian_perubahan',   label: 'Akta Kematian',                                  required: false, showWhenKategori: ['perubahan_data'] },
+
+    // KK HILANG
+    { key: 'kk_hilang',               label: 'Kartu Keluarga (jika ada, lampirkan fotokopi)',   required: false, showWhenKategori: ['hilang'] },
+    { key: 'surat_kehilangan_hilang',  label: 'Surat Kehilangan dari Kepolisian',                required: true, showWhenKategori: ['hilang'] },
+    { key: 'form_kk_baru_f115_hilang', label: 'Form KK Baru F-1.15 (dari Desa)',                required: false, showWhenKategori: ['hilang'] },
+    { key: 'form_dafduk_f102_hilang',  label: 'Form Permohonan Dafduk F-1.02 (dari Desa)',      required: true, showWhenKategori: ['hilang'] },
+
+    // KK RUSAK
+    { key: 'kk_lama_rusak',           label: 'Kartu Keluarga Lama / Rusak',                     required: true, showWhenKategori: ['rusak'] },
+    { key: 'surat_nikah_rusak',       label: 'Surat Nikah / Cerai / SPTJM',                    required: false, showWhenKategori: ['rusak'] },
+    { key: 'form_kk_baru_f115_rusak', label: 'Form KK Baru F-1.15 (dari Desa)',                required: false, showWhenKategori: ['rusak'] },
+    { key: 'form_dafduk_f102_rusak',  label: 'Form Permohonan Dafduk F-1.02 (dari Desa)',      required: true, showWhenKategori: ['rusak'] },
   ],
 };
 
@@ -73,6 +73,8 @@ const akteLahir: LayananDefinition = {
   kategori: [
     { value: 'baru', label: 'Akte Baru', description: 'Pembuatan akte kelahiran anak baru' },
     { value: 'perubahan_data', label: 'Perubahan Data', description: 'Perubahan data pada akte kelahiran yang sudah ada' },
+    { value: 'hilang', label: 'Akte Hilang', description: 'Pengajuan akte kelahiran yang hilang' },
+    { value: 'rusak', label: 'Akte Rusak', description: 'Pengajuan akte kelahiran yang rusak atau tidak terbaca' },
   ],
   fields: [
     { key: 'nik_pemohon', label: 'NIK Pemohon (Ayah/Ibu)', type: 'text', required: false, group: 'pemohon' },
@@ -97,25 +99,38 @@ const akteLahir: LayananDefinition = {
   ],
   dokumen: [
     // AKTE BARU
-    { key: 'surat_nikah_baru',         label: 'Surat Nikah / Cerai / SPTJM',                    required: false, showWhenKategori: ['baru'] },
-    { key: 'kk_baru',                  label: 'Kartu Keluarga',                                  required: false, showWhenKategori: ['baru'] },
-    { key: 'ktp_ortu_baru',           label: 'KTP Orang Tua',                                   required: false, showWhenKategori: ['baru'] },
-    { key: 'ktp_saksi_baru',          label: 'KTP Saksi',                                       required: false, showWhenKategori: ['baru'] },
-    { key: 'ktp_pelapor_baru',        label: 'KTP Pelapor',                                     required: false, showWhenKategori: ['baru'] },
-    { key: 'ket_lahir_bidan_baru',    label: 'Ket. Lahir Bidan / SPTJM Kelahiran',             required: false, showWhenKategori: ['baru'] },
-    { key: 'form_kelahiran_f201_baru', label: 'Form Kelahiran Capil F-2.01',                    required: false, showWhenKategori: ['baru'] },
+    { key: 'surat_nikah_baru',         label: 'Surat Nikah / Cerai / SPTJM',                    required: true, showWhenKategori: ['baru'] },
+    { key: 'kk_baru',                  label: 'Kartu Keluarga',                                  required: true, showWhenKategori: ['baru'] },
+    { key: 'ktp_ortu_baru',           label: 'KTP Orang Tua',                                   required: true, showWhenKategori: ['baru'] },
+    { key: 'ktp_saksi_baru',          label: 'KTP Saksi',                                       required: true, showWhenKategori: ['baru'] },
+    { key: 'ktp_pelapor_baru',        label: 'KTP Pelapor',                                     required: true, showWhenKategori: ['baru'] },
+    { key: 'ket_lahir_bidan_baru',    label: 'Ket. Lahir Bidan / SPTJM Kelahiran',             required: true, showWhenKategori: ['baru'] },
+    { key: 'form_kelahiran_f201_baru', label: 'Form Kelahiran Capil F-2.01',                    required: true, showWhenKategori: ['baru'] },
+
     // PERUBAHAN DATA
-    { key: 'kk_perubahan',            label: 'Kartu Keluarga Lama / Rusak',                     required: false, showWhenKategori: ['perubahan_data'] },
-    { key: 'surat_nikah_perubahan',   label: 'Surat Nikah / Cerai / SPTJM',                    required: false, showWhenKategori: ['perubahan_data'] },
+    { key: 'kk_perubahan',            label: 'Kartu Keluarga Lama / Rusak',                     required: true, showWhenKategori: ['perubahan_data'] },
+    { key: 'surat_nikah_perubahan',   label: 'Surat Nikah / Cerai / SPTJM',                    required: true, showWhenKategori: ['perubahan_data'] },
     { key: 'surat_pindah_perubahan',  label: 'Surat Pindah',                                    required: false, showWhenKategori: ['perubahan_data'] },
     { key: 'akte_lahir_perubahan',    label: 'Akta Kelahiran / Ket. Lahir',                     required: false, showWhenKategori: ['perubahan_data'] },
     { key: 'surat_kehilangan_perubahan', label: 'Surat Kehilangan',                             required: false, showWhenKategori: ['perubahan_data'] },
-    { key: 'ktp_ortu_perubahan',      label: 'KTP Orang Tua',                                   required: false, showWhenKategori: ['perubahan_data'] },
-    { key: 'ktp_saksi_perubahan',     label: 'KTP Saksi',                                       required: false, showWhenKategori: ['perubahan_data'] },
-    { key: 'ktp_pelapor_perubahan',   label: 'KTP Pelapor',                                     required: false, showWhenKategori: ['perubahan_data'] },
-    { key: 'ket_lahir_bidan_perubahan', label: 'Ket. Lahir Bidan / SPTJM Kelahiran',           required: false, showWhenKategori: ['perubahan_data'] },
-    { key: 'form_kelahiran_f201_perubahan', label: 'Form Kelahiran Capil F-2.01',               required: false, showWhenKategori: ['perubahan_data'] },
-    { key: 'fc_ktp_perubahan',        label: 'FC KTP',                                          required: false, showWhenKategori: ['perubahan_data'] },
+    { key: 'ktp_ortu_perubahan',      label: 'KTP Orang Tua',                                   required: true, showWhenKategori: ['perubahan_data'] },
+    { key: 'ktp_saksi_perubahan',     label: 'KTP Saksi',                                       required: true, showWhenKategori: ['perubahan_data'] },
+    { key: 'ktp_pelapor_perubahan',   label: 'KTP Pelapor',                                     required: true, showWhenKategori: ['perubahan_data'] },
+    { key: 'ket_lahir_bidan_perubahan', label: 'Ket. Lahir Bidan / SPTJM Kelahiran',           required: true, showWhenKategori: ['perubahan_data'] },
+    { key: 'form_kelahiran_f201_perubahan', label: 'Form Kelahiran Capil F-2.01',               required: true, showWhenKategori: ['perubahan_data'] },
+    { key: 'fc_ktp_perubahan',        label: 'FC KTP',                                          required: true, showWhenKategori: ['perubahan_data'] },
+
+    // AKTE HILANG
+    { key: 'akta_lahir_hilang',        label: 'Akta Kelahiran / Ket. Lahir',                    required: true, showWhenKategori: ['hilang'] },
+    { key: 'kk_hilang_akte',           label: 'Kartu Keluarga',                                  required: true, showWhenKategori: ['hilang'] },
+    { key: 'surat_kehilangan_akte',     label: 'Surat Kehilangan dari Kepolisian',               required: true, showWhenKategori: ['hilang'] },
+    { key: 'ktp_hilang',               label: 'KTP Asli / Foto KTP',                             required: true, showWhenKategori: ['hilang'] },
+
+    // AKTE RUSAK
+    { key: 'akta_lahir_rusak',         label: 'Akta Kelahiran / Ket. Lahir',                    required: true, showWhenKategori: ['rusak'] },
+    { key: 'kk_rusak',                 label: 'Kartu Keluarga',                                  required: true, showWhenKategori: ['rusak'] },
+    { key: 'ktp_pelapor_rusak',        label: 'KTP Pelapor',                                     required: true, showWhenKategori: ['rusak'] },
+    { key: 'ktp_rusak',               label: 'KTP Asli / Foto KTP',                             required: true, showWhenKategori: ['rusak'] },
   ],
 };
 

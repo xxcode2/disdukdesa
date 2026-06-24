@@ -27,7 +27,7 @@ Aplikasi web untuk warga mengajukan pembuatan **Kartu Keluarga (KK)**, **Akte Ke
 
 ## 2. Konfigurasi Environment Variable
 
-Salin `.env.example` menjadi `.env.local`, lalu isi tiga nilai di atas:
+3. Salin `.env.example` menjadi `.env.local`, lalu isi nilai di atas dan tambahan variabel Telegram:
 
 ```bash
 cp .env.example .env.local
@@ -37,6 +37,8 @@ cp .env.example .env.local
 NEXT_PUBLIC_SUPABASE_URL=https://xxxxxxxxxxxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=ey...
 SUPABASE_SERVICE_ROLE_KEY=ey...
+TELEGRAM_BOT_TOKEN=123456789:ABCdefGhIJKlmNoPQRstuVWXyz
+TELEGRAM_CHAT_ID=-1001234567890
 ```
 
 ## 3. Jalankan di Komputer (opsional, untuk coba-coba dulu)

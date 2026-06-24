@@ -52,7 +52,7 @@ async function kirimNotifikasiTelegram(data: {
       body: JSON.stringify({
         chat_id: chatId,
         text: pesan,
-        parse_mode: 'Markdown',
+        disable_web_page_preview: true,
       }),
     });
 

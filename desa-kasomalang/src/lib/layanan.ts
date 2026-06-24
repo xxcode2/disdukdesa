@@ -47,28 +47,21 @@ const kk: LayananDefinition = {
     { key: 'ijazah_perubahan',         label: 'Ijasah / Ket. Tidak Punya Ijasah',               required: false, showWhenKategori: ['perubahan_data'] },
     { key: 'akte_lahir_perubahan',     label: 'Akta Kelahiran / Ket. Lahir',                    required: false, showWhenKategori: ['perubahan_data'] },
     { key: 'form_perubahan_kk_f106',   label: 'Form Perubahan KK F-1.06 (dari Desa)',           required: false, showWhenKategori: ['perubahan_data'] },
-    { key: 'form_biodata_perubahan',   label: 'Form Biodata KK F-1.01 (dari Desa)',             required: false, showWhenKategori: ['perubahan_data'] },
     { key: 'akta_kematian_perubahan',  label: 'Akta Kematian',                                  required: false, showWhenKategori: ['perubahan_data'] },
     { key: 'surat_ket_kependudukan_perubahan', label: 'Surat Keterangan Peristiwa Kependudukan', required: false, showWhenKategori: ['perubahan_data'] },
 
     // KK HILANG
-    { key: 'form_biodata_hilang',      label: 'Form Biodata KK F-1.01 (dari Desa)',             required: false, showWhenKategori: ['hilang'] },
     { key: 'kk_hilang',                label: 'Kartu Keluarga (opsional jika hilang, lampirkan fotokopi jika ada)', required: false, showWhenKategori: ['hilang'] },
     { key: 'surat_kehilangan_hilang',  label: 'Surat Kehilangan dari Kepolisian',                required: true, showWhenKategori: ['hilang'] },
     { key: 'form_kk_baru_f115_hilang', label: 'Form KK Baru F-1.15 (opsional)',                required: false, showWhenKategori: ['hilang'] },
 
     // KK RUSAK
     { key: 'kk_lama_rusak',            label: 'Kartu Keluarga Lama / Rusak',                    required: true, showWhenKategori: ['rusak'] },
-    { key: 'surat_nikah_rusak',        label: 'Surat Nikah / Cerai / SPTJM',                    required: false, showWhenKategori: ['rusak'] },
-    { key: 'form_biodata_rusak',       label: 'Form Biodata KK F-1.01 (dari Desa)',             required: true, showWhenKategori: ['rusak'] },
+    { key: 'surat_nikah_rusak',        label: 'Surat Nikah / Cerai / SPTJM',                    required: true, showWhenKategori: ['rusak'] },
     { key: 'form_kk_baru_f115_rusak',  label: 'Form KK Baru F-1.15 (dari Desa)',                required: true, showWhenKategori: ['rusak'] },
-    { key: 'form_dafduk_f102_rusak',   label: 'Form Permohonan Dafduk F-1.02 (dari Desa)',      required: true, showWhenKategori: ['rusak'] },
   ],
 };
 
-// =========================================================
-// AKTE KELAHIRAN
-// =========================================================
 const akteLahir: LayananDefinition = {
   jenis: 'akte_lahir',
   judul: 'Akte Kelahiran',

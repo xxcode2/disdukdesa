@@ -2,165 +2,67 @@ import Link from 'next/link';
 import { Users, Baby, HeartCrack, Truck, ArrowRight, MessageCircleMore, ChevronDown, TicketCheck } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { LAYANAN, getDokumenUntukKategori } from '@/lib/layanan';
 
 // ──────────────────────────────────────────────
 // DATA PERSYARATAN PER LAYANAN
 // ──────────────────────────────────────────────
-const persyaratan = [
+const layananInfo = [
   {
+    jenis: 'kk',
     href: '/ajukan/kk',
     icon: Users,
     judul: 'Kartu Keluarga (KK)',
     warna: 'bg-sawah/10 text-sawah-gelap',
     border: 'border-sawah/30',
-    kategori: [
-      {
-        label: 'KK Baru',
-        dokumen: [
-          'Surat Nikah / Cerai / SPTJM (jika sudah menikah)',
-          'Ijasah / Ket. Tidak Punya Ijasah (opsional)',
-          'Akta Kelahiran / Ket. Lahir (opsional)',
-          'Form Biodata KK F-1.01 (dari Desa) (opsional)',
-          'Kartu Keluarga (wajib jika sudah menikah; jika belum, ikut KK orang tua)',
-          'Form KK Baru F-1.15 (dari Desa)',
-          'KTP Asli / Foto KTP (suami/istri jika sudah menikah; satu saja jika belum)',
-          'Surat Keterangan Peristiwa Kependudukan (opsional)',
-          'Form Permohonan Dafduk F-1.02 (dari Desa)',
-        ],
-      },
-      {
-        label: 'Perubahan Data',
-        dokumen: [
-          'Kartu Keluarga Lama / Rusak',
-          'Surat Nikah / Cerai / SPTJM (opsional)',
-          'Surat Pindah (opsional)',
-          'Ijasah / Ket. Tidak Punya Ijasah (opsional)',
-          'Akta Kelahiran / Ket. Lahir (opsional)',
-          'Form Perubahan KK F-1.06 (dari Desa) (opsional)',
-          'Form Biodata KK F-1.01 (opsional)',
-          'KTP Asli / Foto KTP (suami/istri jika sudah menikah; satu saja jika belum)',
-          'Akta Kematian (opsional)',
-          'Surat Keterangan Peristiwa Kependudukan (opsional)',
-          'Form Permohonan Dafduk F-1.02 (dari Desa)',
-        ],
-      },
-      {
-        label: 'KK Hilang',
-        dokumen: [
-          'Form Biodata KK F-1.01 (opsional)',
-          'Kartu Keluarga (opsional jika hilang, lampirkan fotokopi jika ada)',
-          'Surat Kehilangan dari Kepolisian',
-          'Form KK Baru F-1.15 (opsional)',
-          'KTP Asli / Foto KTP',
-          'Form Permohonan Dafduk F-1.02 (dari Desa)',
-        ],
-      },
-      {
-        label: 'KK Rusak',
-        dokumen: [
-          'Kartu Keluarga Lama / Rusak',
-          'Surat Nikah / Cerai / SPTJM',
-          'Form Biodata KK F-1.01',
-          'Form KK Baru F-1.15',
-          'KTP Asli / Foto KTP',
-          'Form Permohonan Dafduk F-1.02 (dari Desa)',
-        ],
-      },
-    ],
   },
   {
+    jenis: 'akte_lahir',
     href: '/ajukan/akte_lahir',
     icon: Baby,
     judul: 'Akte Kelahiran',
     warna: 'bg-biru/10 text-biru-gelap',
     border: 'border-biru/30',
-    kategori: [
-      {
-        label: 'Akte Baru',
-        dokumen: [
-          'Surat Nikah / Cerai / SPTJM (wajib)',
-          'Kartu Keluarga (wajib)',
-          'KTP Orang Tua (wajib)',
-          'KTP Saksi (wajib)',
-          'KTP Pelapor (wajib)',
-          'Ket. Lahir Bidan / SPTJM Kelahiran (wajib)',
-          'Form Kelahiran Capil F-2.01 (wajib)',
-        ],
-      },
-      {
-        label: 'Perubahan Data',
-        dokumen: [
-          'Kartu Keluarga Lama / Rusak (wajib)',
-          'Surat Nikah / Cerai / SPTJM (wajib)',
-          'Surat Pindah (opsional)',
-          'Akta Kelahiran / Ket. Lahir (opsional)',
-          'Surat Kehilangan (opsional)',
-          'KTP Orang Tua (wajib)',
-          'KTP Saksi (wajib)',
-          'KTP Pelapor (wajib)',
-          'Ket. Lahir Bidan / SPTJM',
-          'Form Kelahiran Capil F-2.01',
-          'KTP Asli / Foto KTP',
-        ],
-      },
-      {
-        label: 'Akte Hilang',
-        dokumen: [
-          'Akta Kelahiran / Ket. Lahir (wajib)',
-          'Kartu Keluarga (wajib)',
-          'Surat Kehilangan dari Kepolisian (wajib)',
-          'KTP Asli / Foto KTP (wajib)',
-        ],
-      },
-      {
-        label: 'Akte Rusak',
-        dokumen: [
-          'Akta Kelahiran / Ket. Lahir (wajib)',
-          'Kartu Keluarga (wajib)',
-          'KTP Pelapor (wajib)',
-          'KTP Asli / Foto KTP (wajib)',
-        ],
-      },
-    ],
   },
   {
+    jenis: 'akte_mati',
     href: '/ajukan/akte_mati',
     icon: HeartCrack,
     judul: 'Akte Kematian',
     warna: 'bg-bata/10 text-bata',
     border: 'border-bata/30',
-    kategori: [
-      {
-        label: 'Persyaratan',
-        dokumen: [
-          'Kartu Keluarga (KK) (wajib)',
-          'KTP Saksi 1 (wajib)',
-          'KTP Pelapor (wajib)',
-          'KTP Asli / Foto KTP (wajib)',
-          'Form Kematian F-2.01 (opsional dari Desa)',
-          'Surat / Ket. Kematian dari RS atau Desa',
-        ],
-      },
-    ],
   },
   {
+    jenis: 'surat_pindah',
     href: '/ajukan/surat_pindah',
     icon: Truck,
     judul: 'Surat Pindah',
     warna: 'bg-emas/10 text-emas-gelap',
     border: 'border-emas/30',
-    kategori: [
-      {
-        label: 'Persyaratan',
-        dokumen: [
-          'Kartu Keluarga (KK)',
-          'Foto Copy KTP',
-          'Form Perpindahan dari Desa (jika ada)',
-        ],
-      },
-    ],
   },
 ];
+
+const persyaratan = layananInfo.map((layanan) => {
+  const layananDef = LAYANAN[layanan.jenis];
+  const kategori = layananDef.kategori?.map((kat) => ({
+    label: kat.label,
+    dokumen: getDokumenUntukKategori(layananDef, kat.value).map((dok) =>
+      `${dok.label}${dok.required ? ' (wajib)' : ' (opsional)'}`
+    ),
+  })) ?? [
+    {
+      label: 'Persyaratan',
+      dokumen: getDokumenUntukKategori(layananDef).map((dok) =>
+        `${dok.label}${dok.required ? ' (wajib)' : ' (opsional)'}`
+      ),
+    },
+  ];
+
+  return {
+    ...layanan,
+    kategori,
+  };
+});
 
 // ──────────────────────────────────────────────
 // KOMPONEN ACCORDION PERSYARATAN

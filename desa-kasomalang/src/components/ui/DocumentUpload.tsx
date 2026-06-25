@@ -95,7 +95,7 @@ export function DocumentUpload({ doc, file, onChange, error }: DocumentUploadPro
               className="inline-flex items-center gap-1 text-xs font-semibold text-sawah-gelap mt-1.5 hover:underline"
             >
               <Download size={12} />
-              Unduh form kosong (PDF)
+              {doc.formLabel || 'Unduh form kosong (PDF)'}
             </a>
           )}
         </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { Camera, FileCheck2, Loader2, X } from 'lucide-react';
+import { Camera, Download, FileCheck2, Loader2, X } from 'lucide-react';
 import { DocumentRequirement } from '@/types';
 import { compressImage } from '@/lib/compressImage';
 
@@ -87,6 +87,17 @@ export function DocumentUpload({ doc, file, onChange, error }: DocumentUploadPro
           <p className="text-xs text-tinta/60 mt-0.5">
             {doc.helpText || 'Format: JPEG, foto langsung dari HP juga bisa — ukuran otomatis disesuaikan'}
           </p>
+          {doc.formUrl && (
+            <a
+              href={doc.formUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-sawah-gelap mt-1.5 hover:underline"
+            >
+              <Download size={12} />
+              Unduh form kosong (PDF)
+            </a>
+          )}
         </div>
       </div>
 

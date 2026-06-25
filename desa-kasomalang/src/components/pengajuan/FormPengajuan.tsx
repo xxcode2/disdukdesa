@@ -209,6 +209,19 @@ export function FormPengajuan({ layanan }: FormPengajuanProps) {
           <p className="text-sm text-tinta/70 -mt-2 mb-1">
             Foto harus jelas dan terbaca. Anda bisa memotret langsung atau memilih dari galeri.
           </p>
+
+          {dokumenList.some((d) => d.formUrl) && (
+            <div className="rounded-xl border-2 border-sawah/30 bg-sawah/5 px-4 py-3">
+              <p className="text-sm font-semibold text-sawah-gelap">
+                📄 Beberapa form sudah disiapkan Desa
+              </p>
+              <p className="text-xs text-tinta/60 mt-1">
+                Cari tombol <span className="font-semibold">&quot;Unduh form&quot;</span> di bawah nama dokumen yang perlu diisi —
+                tidak perlu cari sendiri ke kantor desa, unduh, isi, foto, lalu lampirkan di sini.
+              </p>
+            </div>
+          )}
+
           {dokumenList.map((d) => (
             <DocumentUpload
               key={d.key}

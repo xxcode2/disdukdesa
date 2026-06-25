@@ -29,8 +29,8 @@ const kk: LayananDefinition = {
   ],
   dokumen: [
     // KK BARU
-    { key: 'surat_nikah_baru',          label: 'Surat Nikah (jika sudah menikah)',                required: false, showWhenKategori: ['baru'] },
-    { key: 'ijazah_baru',               label: 'Ijazah / Keterangan Tidak Punya Ijazah',          required: false, showWhenKategori: ['baru'] },
+    { key: 'surat_nikah_baru',          label: 'Surat Nikah (jika sudah menikah)',                required: false, showWhenKategori: ['baru'], helpText: 'Belum punya buku nikah resmi? Bisa pakai SPTJM Perkawinan Belum Tercatat', formUrl: '/forms/F-1.05_SPTJM_PERKAWINAN_BELUM_TERCATAT.pdf', formLabel: 'Unduh contoh SPTJM' },
+    { key: 'ijazah_baru',               label: 'Ijazah / Keterangan Tidak Punya Ijazah',          required: false, showWhenKategori: ['baru'], helpText: 'Tidak punya ijazah? Bisa pakai SPTJM Tidak Memiliki Dokumen Kependudukan', formUrl: '/forms/F-1.04_SURAT_PERNYATAAN_TIDAK_MEMILIKI_DOKUMEN_KEPENDUDUKAN.pdf' },
     { key: 'akte_lahir_baru',           label: 'Akta Kelahiran / Ket. Lahir',                     required: false, showWhenKategori: ['baru'] },
     { key: 'form_biodata_f101_baru',    label: 'Form Biodata KK F-1.01 (dari Desa)',              required: false, showWhenKategori: ['baru'], formUrl: '/forms/F-1.01_FORMULIR_BIODATA_KELUARGA.pdf' },
     { key: 'kk_lama_baru',              label: 'Kartu Keluarga (jika sudah menikah: KK istri & suami; jika belum: ikut KK orang tua)', required: true, showWhenKategori: ['baru'] },
@@ -41,9 +41,9 @@ const kk: LayananDefinition = {
 
     // PERUBAHAN DATA
     { key: 'kk_lama_perubahan',         label: 'Kartu Keluarga Lama / Rusak',                     required: true,  showWhenKategori: ['perubahan_data'] },
-    { key: 'surat_nikah_perubahan',     label: 'Surat Nikah / Cerai / SPTJM',                     required: false, showWhenKategori: ['perubahan_data'] },
+    { key: 'surat_nikah_perubahan',     label: 'Surat Nikah / Cerai / SPTJM',                     required: false, showWhenKategori: ['perubahan_data'], helpText: 'Belum punya buku nikah resmi? Bisa pakai SPTJM Perkawinan Belum Tercatat', formUrl: '/forms/F-1.05_SPTJM_PERKAWINAN_BELUM_TERCATAT.pdf', formLabel: 'Unduh contoh SPTJM' },
     { key: 'surat_pindah_perubahan',    label: 'Surat Pindah',                                    required: false, showWhenKategori: ['perubahan_data'] },
-    { key: 'ijazah_perubahan',          label: 'Ijazah / Keterangan Tidak Punya Ijazah',          required: false, showWhenKategori: ['perubahan_data'] },
+    { key: 'ijazah_perubahan',          label: 'Ijazah / Keterangan Tidak Punya Ijazah',          required: false, showWhenKategori: ['perubahan_data'], helpText: 'Tidak punya ijazah? Bisa pakai SPTJM Tidak Memiliki Dokumen Kependudukan', formUrl: '/forms/F-1.04_SURAT_PERNYATAAN_TIDAK_MEMILIKI_DOKUMEN_KEPENDUDUKAN.pdf' },
     { key: 'akte_lahir_perubahan',      label: 'Akta Kelahiran / Ket. Lahir',                     required: false, showWhenKategori: ['perubahan_data'] },
     { key: 'form_perubahan_f106',       label: 'Form Perubahan KK F-1.06 (dari Desa)',            required: false, showWhenKategori: ['perubahan_data'], helpText: 'Idealnya wajib, tapi dibuat opsional karena warga umumnya belum punya form ini', formUrl: '/forms/F-1.06_SURAT_PERNYATAAN_PERUBAHAN_ELEMEN_DATA_KEPENDUDUKAN.pdf' },
     { key: 'form_biodata_f101_perubahan', label: 'Form Biodata KK F-1.01',                        required: false, showWhenKategori: ['perubahan_data'], formUrl: '/forms/F-1.01_FORMULIR_BIODATA_KELUARGA.pdf' },
@@ -62,7 +62,7 @@ const kk: LayananDefinition = {
 
     // KK RUSAK
     { key: 'kk_lama_rusak',             label: 'Kartu Keluarga',                                  required: true,  showWhenKategori: ['rusak'] },
-    { key: 'surat_nikah_rusak',         label: 'Surat Nikah / Cerai / SPTJM',                     required: false, showWhenKategori: ['rusak'] },
+    { key: 'surat_nikah_rusak',         label: 'Surat Nikah / Cerai / SPTJM',                     required: false, showWhenKategori: ['rusak'], helpText: 'Belum punya buku nikah resmi? Bisa pakai SPTJM Perkawinan Belum Tercatat', formUrl: '/forms/F-1.05_SPTJM_PERKAWINAN_BELUM_TERCATAT.pdf', formLabel: 'Unduh contoh SPTJM' },
     { key: 'form_biodata_f101_rusak',   label: 'Form Biodata KK F-1.01',                          required: false, showWhenKategori: ['rusak'], formUrl: '/forms/F-1.01_FORMULIR_BIODATA_KELUARGA.pdf' },
     { key: 'form_kk_baru_f115_rusak',   label: 'Form KK Baru F-1.15 (dari Desa)',                 required: false, showWhenKategori: ['rusak'] },
     { key: 'ktp_rusak',                 label: 'KTP',                                              required: true,  showWhenKategori: ['rusak'] },
@@ -103,24 +103,24 @@ const akteLahir: LayananDefinition = {
   ],
   dokumen: [
     // AKTE BARU
-    { key: 'surat_nikah_baru',         label: 'Surat Nikah / Cerai / SPTJM',                    required: true,  showWhenKategori: ['baru'] },
+    { key: 'surat_nikah_baru',         label: 'Surat Nikah / Cerai / SPTJM',                    required: true,  showWhenKategori: ['baru'], helpText: 'Belum tercatat resmi? Bisa pakai SPTJM Perkawinan Belum Tercatat', formUrl: '/forms/F-1.05_SPTJM_PERKAWINAN_BELUM_TERCATAT.pdf', formLabel: 'Unduh contoh SPTJM' },
     { key: 'kk_baru',                  label: 'Kartu Keluarga',                                  required: true,  showWhenKategori: ['baru'] },
     { key: 'ktp_ortu_baru',           label: 'KTP Orang Tua',                                   required: true,  showWhenKategori: ['baru'] },
     { key: 'ktp_saksi_baru',          label: 'KTP Saksi',                                       required: true,  showWhenKategori: ['baru'] },
     { key: 'ktp_pelapor_baru',        label: 'KTP Pelapor',                                     required: true,  showWhenKategori: ['baru'] },
-    { key: 'ket_lahir_bidan_baru',    label: 'Ket. Lahir Bidan / SPTJM Kelahiran',             required: true,  showWhenKategori: ['baru'] },
+    { key: 'ket_lahir_bidan_baru',    label: 'Ket. Lahir Bidan / SPTJM Kelahiran',             required: true,  showWhenKategori: ['baru'], helpText: 'Tidak ada surat dari bidan/RS? Bisa pakai SPTJM Kebenaran Data Kelahiran', formUrl: '/forms/F-2.03_SPTJM_KELAHIRAN.pdf', formLabel: 'Unduh contoh SPTJM' },
     { key: 'form_kelahiran_f201_baru', label: 'Form Kelahiran Capil F-2.01',                    required: false, showWhenKategori: ['baru'], formUrl: '/forms/F-2.01_FORMULIR_PELAPORAN_PENCATATAN_SIPIL.pdf' },
 
     // PERUBAHAN DATA
     { key: 'kk_perubahan',            label: 'Kartu Keluarga',                                  required: true,  showWhenKategori: ['perubahan_data'] },
-    { key: 'surat_nikah_perubahan',   label: 'Surat Nikah / Cerai / SPTJM',                    required: true,  showWhenKategori: ['perubahan_data'] },
+    { key: 'surat_nikah_perubahan',   label: 'Surat Nikah / Cerai / SPTJM',                    required: true,  showWhenKategori: ['perubahan_data'], helpText: 'Belum tercatat resmi? Bisa pakai SPTJM Perkawinan Belum Tercatat', formUrl: '/forms/F-1.05_SPTJM_PERKAWINAN_BELUM_TERCATAT.pdf', formLabel: 'Unduh contoh SPTJM' },
     { key: 'surat_pindah_perubahan',  label: 'Surat Pindah',                                    required: false, showWhenKategori: ['perubahan_data'] },
     { key: 'akte_lahir_perubahan',    label: 'Akta Kelahiran / Ket. Lahir',                     required: false, showWhenKategori: ['perubahan_data'] },
     { key: 'surat_kehilangan_perubahan', label: 'Surat Kehilangan',                             required: false, showWhenKategori: ['perubahan_data'] },
     { key: 'ktp_ortu_perubahan',      label: 'KTP Orang Tua',                                   required: false, showWhenKategori: ['perubahan_data'] },
     { key: 'ktp_saksi_perubahan',     label: 'KTP Saksi',                                       required: false, showWhenKategori: ['perubahan_data'] },
     { key: 'ktp_pelapor_perubahan',   label: 'KTP Pelapor',                                     required: false, showWhenKategori: ['perubahan_data'] },
-    { key: 'ket_lahir_bidan_perubahan', label: 'Ket. Lahir Bidan / SPTJM Kelahiran',           required: false, showWhenKategori: ['perubahan_data'] },
+    { key: 'ket_lahir_bidan_perubahan', label: 'Ket. Lahir Bidan / SPTJM Kelahiran',           required: false, showWhenKategori: ['perubahan_data'], helpText: 'Tidak ada surat dari bidan/RS? Bisa pakai SPTJM Kebenaran Data Kelahiran', formUrl: '/forms/F-2.03_SPTJM_KELAHIRAN.pdf', formLabel: 'Unduh contoh SPTJM' },
     { key: 'form_kelahiran_f201_perubahan', label: 'Form Kelahiran Capil F-2.01',               required: false, showWhenKategori: ['perubahan_data'], formUrl: '/forms/F-2.01_FORMULIR_PELAPORAN_PENCATATAN_SIPIL.pdf' },
     { key: 'ktp_perubahan',           label: 'KTP',                                             required: false, showWhenKategori: ['perubahan_data'] },
 
@@ -171,7 +171,7 @@ const akteMati: LayananDefinition = {
     { key: 'ktp_saksi_2', label: 'Foto KTP Saksi 2', required: false },
     { key: 'ktp_pelapor', label: 'Foto KTP Pelapor', required: true },
     { key: 'formulir_kematian_desa', label: 'Form Kematian F-2.01 (dari Desa, opsional)', required: false, formUrl: '/forms/FORMULIR_KEMATIAN_BARU.pdf' },
-    { key: 'surat_keterangan_kematian', label: 'Surat/Keterangan Kematian dari RS atau Desa', required: true },
+    { key: 'surat_keterangan_kematian', label: 'Surat/Keterangan Kematian dari RS atau Desa', required: true, helpText: 'Tidak ada surat dari RS? Bisa pakai SPTJM Kebenaran Data Kematian', formUrl: '/forms/SPTJM_KEMATIAN.pdf', formLabel: 'Unduh contoh SPTJM' },
   ],
 };
 

@@ -105,7 +105,6 @@ export function DocumentUpload({ doc, file, onChange, error }: DocumentUploadPro
         ref={inputRef}
         type="file"
         accept=".jpg,.jpeg,image/jpeg"
-        capture="environment"
         className="hidden"
         onChange={handleFileChange}
         disabled={memproses}

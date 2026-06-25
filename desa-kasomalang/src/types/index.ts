@@ -26,6 +26,10 @@ export interface DocumentRequirement {
   // Link unduh template/formulir kosong (PDF dari Desa) jika dokumen ini
   // berupa formulir resmi yang perlu warga isi & cetak sendiri.
   formUrl?: string;
+  // Teks kustom untuk tombol unduh form, mis. "Unduh contoh SPTJM" vs
+  // default "Unduh form kosong (PDF)". Berguna saat form itu sifatnya
+  // alternatif/pengganti dokumen (SPTJM), bukan form isian wajib biasa.
+  formLabel?: string;
 }
 
 export interface KategoriOption {

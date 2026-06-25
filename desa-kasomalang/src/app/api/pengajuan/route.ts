@@ -26,6 +26,8 @@ async function kirimNotifikasiTelegram(data: {
   kategori?: string | null;
   namaPemohon: string;
   noHp: string;
+  rt?: string | null;
+  rw?: string | null;
   jumlahDokumen: number;
 }) {
   const botToken = process.env.TELEGRAM_BOT_TOKEN;
@@ -36,12 +38,18 @@ async function kirimNotifikasiTelegram(data: {
     return;
   }
 
+  // Tampilkan RT/RW jika salah satu atau keduanya terisi, format "003/002"
+  // atau "003/-" jika cuma salah satu yang ada. Disembunyikan sepenuhnya
+  // jika warga tidak mengisi RT maupun RW.
+  const rtRw = data.rt || data.rw ? `${data.rt || '-'}/${data.rw || '-'}` : null;
+
   const pesan =
     `📋 *Pengajuan Baru Masuk*\n\n` +
     `🎫 Kode Tiket: \`${data.kodeTiket}\`\n` +
     `📁 Layanan: ${data.jenisLayanan}${data.kategori ? ` (${data.kategori})` : ''}\n` +
     `👤 Nama: ${data.namaPemohon}\n` +
     `📱 No. HP: ${data.noHp}\n` +
+    (rtRw ? `🏠 RT/RW: ${rtRw}\n` : '') +
     `📎 Dokumen terlampir: ${data.jumlahDokumen}\n\n` +
     `Silakan cek dashboard admin untuk detail lengkap.`;
 
@@ -306,6 +314,8 @@ export async function POST(req: NextRequest) {
       kategori,
       namaPemohon,
       noHp,
+      rt: formData.get('rt') ? String(formData.get('rt')) : null,
+      rw: formData.get('rw') ? String(formData.get('rw')) : null,
       jumlahDokumen: dokumenEntries.length,
     });
 
